@@ -44,6 +44,7 @@ A (mostly) up-to-date list of books I at some point, have wanted to read, am rea
 
 ### 2025
 
+- **Stories of Your Life and Others** by Ted Chiang
 - **A Prayer for the Crown-Shy** by Becky Chambers
 - **A Psalm for the Wild-Built** by Becky Chambers
 - **The Lathe of Heaven** by Ursula K. Le Guin

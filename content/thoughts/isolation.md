@@ -45,7 +45,7 @@ Allows "phantom reads": same query in a transaction can return new rows
 
 Each transaction sees a consistent snapshot of the database from when it started
 
-Allows "write skew anomalies": two concurrent transactions read overlapping data and make decisions based on what they read, but their combined writes create an inconsistent state that violates business rules (e.g. two concurrent transactions try to deduct $50 from an account with $60 in it, both checking to see if there is at least $50. It is possible that both reads succeed and say that the account has more than $50 but the combined writes violate the invariant that the account has more than $0.)
+Allows "write skew anomalies": two concurrent transactions read overlapping data and make decisions based on what they read, but their combined writes create an inconsistent state that violates business rules (e.g. two concurrent transactions try to deduct 50 from an account with 60 in it, both checking to see if there is at least 50. It is possible that both reads succeed and say that the account has more than 50 but the combined writes violate the invariant that the account has more than 0.)
 
 ### Serializable
 

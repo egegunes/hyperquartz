@@ -5,4 +5,3 @@ tags:
   - seed
 ---
 Based on the [[thoughts/Database#Relational model]] proposed by Edgar Codd in 1970
-

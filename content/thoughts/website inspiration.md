@@ -31,6 +31,8 @@ tags:
 - https://www.yihui.work/: cards
 - https://andrewtrousdale.com/: map
 - https://thehtml.review/04/: depth scroll
+- https://apossible.com/: split infinite canvas
+- https://devouringdetails.com/: yummy horizontal scroll
 
 ## Aesthetics
 
