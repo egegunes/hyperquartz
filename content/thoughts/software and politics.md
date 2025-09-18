@@ -15,7 +15,7 @@ tags:
 
 "I think where most software engineers fail at politics, it's in understanding that key point. We tend to over engineer our systems and never need to explain the inner workings to anyone who is non-technical. This isn't restricted to just software engineers, of course. Any sufficiently advanced technology is difficult to explain in terms a non-expert can understand. But we do, at least, understand that we need to tailor the front-end user experience to the target demographic."
 
-Curious how this ties into the [over simplification of user interfaces](/thoughts/books/mindstorms#Microworlds and simplification)
+Curious how this ties into the [[thoughts/Mindstorms#Microworlds and simplification|over simplification of user interfaces]]
 
 "Blockchain voting fails at the most basic test of social technology: can you explain how it works to someone skeptical of the people in power in a way that makes them [[thoughts/trust]] the system?"
 

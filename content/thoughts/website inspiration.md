@@ -7,7 +7,7 @@ tags:
 ## Fun interactions
 
 - http://lynnecarty.info/: blobs! Fun way to visualize overlapping tags in a personal portfolio
-- https://www.boboland.xyz/: sick use of spatial canvas
+- https://www.shaobo.co/: sick use of spatial canvas
 - https://lfe.org/: telescopic text
 - https://christophlabacher.com/notes/ethnographic-research-on-dynamicland: really awesome sidenotes
 - https://tomasp.net/techdims: good non-linear layout of information
