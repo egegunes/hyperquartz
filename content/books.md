@@ -36,14 +36,12 @@ A (mostly) up-to-date list of books I at some point, have wanted to read, am rea
 ### Poetry
 
 - **Without** by David Hall
-## Current
-
-- **Crime and Punishment** by Fyodor Dostoevsky
 
 ## Past
 
 ### 2025
 
+- **Crime and Punishment** by Fyodor Dostoevsky
 - **Stories of Your Life and Others** by Ted Chiang
 - **A Prayer for the Crown-Shy** by Becky Chambers
 - **A Psalm for the Wild-Built** by Becky Chambers
