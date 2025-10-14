@@ -15,9 +15,13 @@ My (considerably longer) list of unfinished ideas can be found [here](thoughts/i
 
 ## Web Poetics
 
+- alt-text, a derivative work of [*Nostalgia* by David Horvitz](https://www.printedmatter.org/catalog/62490/) (2025)
+	- Fun with SVG filters to reproduce the effect of print bleeding on paper
+	- Source: [Site](https://alt-text.jzhao.xyz/), [GitHub](https://github.com/jackyzha0/alttext)
+	- ![[thoughts/images/nostalgia.jpg]]
 - Sunlit, a pure CSS implementation of light streaming through the window (2024)
 	- Experiments in making a website feel more 'lived in'. Fun with `matrix3d`, progressive blur, SVG filters, and sunrise/sunsets.
-	- Source: [GitHub](https://github.com/jackyzha0/sunlit)
+	- Source: [Site](https://sunlit.pages.dev/), [GitHub](https://github.com/jackyzha0/sunlit)
 	- <video class="lazy" data-src="/thoughts/images/sunlit.webm" autoplay loop muted></video>
 - Community Lock Screen Collage, digital installation for [Kernel 4](https://www.kernelmag.io/issues/4) Launch Party (2024)
 	- What would it be like to live with someone else's lock screen for a day? Participants are invited to upload their own lockscreen and download someone else's. The uploaded lockscreens are arranged to create a stylized version of the Kernel 4 cover.
