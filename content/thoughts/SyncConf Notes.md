@@ -66,7 +66,7 @@ Talk by Frank McSherry
 - [[thoughts/incremental view maintenance|Incremental view maintenance]] (keeping computed results up to data given new information)
 	- `data -> f(data)`
 	- `a -> f(a)`
-	- `b - a -> f(b) - f(a)
+	- `b - a -> f(b) - f(a)`
 	- `c - b -> f(c) - f(b)`
 	- Virtual time + incremental view maintenance -> sync
 	- Never incorrect only ever out-of-date (with a bound on 'freshness')
@@ -193,7 +193,7 @@ Talk by swyx
 	- Listening 300wpm
 	- Cost to sync you 24hrs/day into GPT5
 		- Text: $0.09, 150wpm x 60 x 24hrs = 216k tokens
-		- Voice: $4.32-8.64, 1440mins/day = $0.003-6/min
+		- Voice: $4.32-8.64, 1440mins/day
 		- Vision: $7.50, 1080 => 1750 toks, 1fps => 151m tokens
 - Principles
 	- No buttons (don't only trigger inference when the user does something, arguing for 'always-on')
