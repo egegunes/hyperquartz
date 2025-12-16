@@ -11,7 +11,7 @@ Welcome!
 
 I'm Jacky. This is my little [[thoughts/hypertext|hypertext]] [[posts/networked-thought|garden]] on the [[thoughts/Internet|Internet]] -- make yourself at home!
 
-Currently, I'm exploring what [[thoughts/agency|agentic]] and [[posts/agentic-computing|communal]] technology looks like at [Replit](https://replit.com/) and through my [independent research practice](/tags/rhizome). How might we create infrastructures and technologies that empower the residents of the web to have access to the same tools as the architects?
+Currently, I'm exploring what [[posts/agentic-computing|agentic and communal]] technology looks like at [Replit](https://replit.com/). How might we create infrastructures and technologies that empower the residents of the web to have access to the same tools as the architects?
 
 On a broader level, I care deeply about creating _[spaces](https://lu.ma/playspace)_ that enable others to have more [[thoughts/agency]]: agency to ask questions without judgement; agency to do what they are intrinsically drawn toward; agency to [[thoughts/play|play]] (because what's the point if we can't have a bit of fun?).
 

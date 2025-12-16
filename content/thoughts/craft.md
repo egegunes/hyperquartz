@@ -92,7 +92,7 @@ My (considerably longer) list of unfinished ideas can be found [here](thoughts/i
 	-  <video class="lazy" data-src="/thoughts/images/portal-demo.webm" autoplay loop muted></video>
 - **Quartz** -- a static-site generator for note-taking apps (2021)
 	- A tool and workflow to make maintaining and publishing a digital garden and second brain extremely easy. It involved creating a static site generator from scratch. See the [architecture](https://quartz.jzhao.xyz/advanced/architecture) page for more information.
-	- Now has a strong community with 7600+ stars on GitHub, 2600+ forks, and 190+ unique contributors and has been translated in over 23 languages.
+	- Now has a strong community with 10.7k+ stars on GitHub, 3.3k+ forks, and 240+ unique contributors and has been translated in over 23 languages.
 	- Source: [Site](https://quartz.jzhao.xyz/), [GitHub](https://github.com/jackyzha0/quartz)
 	- <video class="lazy" data-src="/thoughts/images/quartz-demo.webm" autoplay loop muted></video>
 - Legist -- a platform to summarize policy for [democracy](thoughts/democracy.md) (2021)
@@ -119,6 +119,12 @@ My (considerably longer) list of unfinished ideas can be found [here](thoughts/i
 
 The following list of writing that I've had the immense fortune of being able to publish externally. For internal writing, you can visit the [[/posts/]] index.
 
+- Replit Blog: Enabling Agent 3 to Self-Test at Scale with REPL-based Verification
+	- In collaboration with [Peter](https://x.com/Lambda_freak) about how self-testing stop autonomous coding agents from making [[thoughts/potemkin village|potemkin villages]].
+	- Links: [original](https://blog.replit.com/automated-self-testing)
+- Replit Blog: Shell2: 200x faster, persisted, multiplayer-native Shells
+	- In collaboration with [Szymon](https://szymonkaliski.com/) about our work on ruspty and the new Shell.
+	- Links: [original](https://blog.replit.com/shell2)
 - Commonplace: The Digital Spaces we want (2023)
 	- A conversation with [Spencer](https://spencerchang.me/) about how digital spaces can learn from how physical spaces are designed to create a sense of aliveness + agency that is hard to find online these days.
 	- Links: [original](https://commonplace.knowledgefutures.org/pub/jxnitpni/release/1), https://campfire.we-b.site/
