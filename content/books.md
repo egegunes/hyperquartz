@@ -26,7 +26,6 @@ A (mostly) up-to-date list of books I at some point, have wanted to read, am rea
 - **The Utopia of Rules** by David Graeber
 - **Inventing the Medium** by Janet J. Murray
 - **Designing an Internet** by David D. Clark
-- **Playing Software** by Miguel Sicart
 - **Designs for the Pluriverse** by Arturo Escobar
 - **New Media Art** by Mark Tribe/Reena Jana
 - **are we human? notes on an archaeology of design** by Beatriz Colomina & Mark Wigley
@@ -41,6 +40,7 @@ A (mostly) up-to-date list of books I at some point, have wanted to read, am rea
 
 ### 2025
 
+- **[[thoughts/Playing Software|Playing Software]]** by Miguel Sicart
 - **Crime and Punishment** by Fyodor Dostoevsky
 - **Stories of Your Life and Others** by Ted Chiang
 - **A Prayer for the Crown-Shy** by Becky Chambers
