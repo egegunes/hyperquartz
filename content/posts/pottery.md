@@ -4,7 +4,7 @@ date: 2025-12-27
 tags:
   - fruit
   - writing
-noindex: true
+draft: true
 ---
 Note: these are not all about pottery.
 
