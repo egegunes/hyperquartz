@@ -31,7 +31,7 @@ Be humble at the mountaintops, be strong in the valleys, and be faithful in betw
 
 "Yet I live earnestly, building the most beautiful sandcastles I can, knowing they will be washed away. And getting others on the beach to build with me, at times even suspending our belief of the fact that it will disappear; letting ourselves be fooled for a moment that it will last." [Source](https://altered.substack.com/p/dust)
 
-"You can’t build railroads before it is railroad time." *(Chuck Thacker)*
+"You can’t build railroads before it is railroad time." *(Chuck Thacker)* ^8e0d44
 
 “Genius is no more than childhood recaptured at will.” _(Charles Baudelaire)_
 

@@ -7,10 +7,25 @@ aliases:
   - large language model
   - large language models
 ---
-
 Large Language Models (LLMs) are [[thoughts/autoregressive model|autoregressive]] foundational machine learning models that use [[thoughts/machine learning]] to process and [[thoughts/NLP|understand natural language]]. They seem to have [[thoughts/emergent behaviour|emergent properties]] of [[thoughts/intelligence]], though this could just be the [[thoughts/observer-expectancy effect]]
 
 See also: [[thoughts/transformers]]
+
+## Prompting and Context Engineering
+
+I like to think of prompting as navigating idea-space.
+
+A prompt changes the priors for the model and reshapes the probability landscape of what could come next. Generating tokens is sampling a trajectory through that landscape.
+
+What you put in the prompt (constraints, examples) is all in favour of keeping likely generations within the neighborhood you care about.
+
+Notes on context engineering:
+- Encourage it to do the [[thoughts/adjacent possible|adjacent possible]] rather than everything all at once.
+	- Smaller rungs are harder to misunderstand
+	- Though some models are learning to do recursive decomposition of tasks, this is not something models are good at yet and having good human judgement here helps a lot.
+- Packets of context are useful for providing context it cannot have gotten during training
+	- e.g. Within this specific codebase, what is the pattern for doing $x$? What are the ways to verify your changes work? What is the historical context for why certain patterns exist? (i.e. [[thoughts/Chesterton's Fence|Chesterton's Fence]])? What is an example of what *good* might look like?
+	- As models change, rework the prompt by by reassessing what needs explanation vs knows intuitively
 
 ## Teaching
 

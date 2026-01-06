@@ -64,6 +64,8 @@ draft: true
 ## notes on work
 - feels good when its on own volition
 - 'dont want to do it because you told me to' effect
+	- "My theory of _real_ is that a creative work is real if it has a good reason to exist. If its creator can look themselves in the eye and say with full honesty that they _know_ why they’re making it, and that they _like_ why they’re making it."
+	- https://letterstomyfriends.substack.com/p/on-doing-real-work
 
 ## what do i want to do with my life
 - i like understanding the systems i like working with
