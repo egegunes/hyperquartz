@@ -20,6 +20,7 @@ A (mostly) up-to-date list of books I at some point, have wanted to read, am rea
 
 ### Non-fiction
 
+- **Small Is Beautiful: A Study of Economics As If People Mattered** by E.F. Schumacher
 - **Weathering** by Ruth Allen
 - **On Giving Up** by Adam Phillips
 - **Life as no one knows it** by Sara Imari Walker

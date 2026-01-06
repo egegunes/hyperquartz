@@ -10,7 +10,7 @@ aliases:
 ---
 > This post is part of an ongoing letter series with [Spencer](https://www.spencerchang.me/) and some other internet friends about what we think the future of the Internet could look like. Find more letters over on our [(we)bsite](https://we-b.site/)
 
-![[thoughts/images/minecraft.png]]
+![[thoughts/images/minecraft.jpg]]
 
 One of the most important factors as to what gives objects a felt sense of 'home' or 'coziness' is the degree to which the object **involves you in its own completion**. The home is a personal statement. The exact layout they choose to layout posters on the wall; the positioning of the plants; how they choose to let light illuminate the hallways; the colours of the walls: these are all expressions of its residents.
 

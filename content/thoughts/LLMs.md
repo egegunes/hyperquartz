@@ -43,7 +43,7 @@ AI is helpful in situations where you need ‘good enough’ code/art/writing wh
 - [https://twitter.com/gordonbrander/status/1600469469419036675](https://twitter.com/gordonbrander/status/1600469469419036675)
 - [https://twitter.com/jachiam0/status/1598448668537155586](https://twitter.com/jachiam0/status/1598448668537155586)
 
-I don't think it's ready to replace anything that requires rigorous thought or reasoning quite yet because it is still very prone to confidently hallucinating wrong answers. LLMs should acts as an atlas and not a map (see: [[thoughts/plurality]])
+I don't think it's ready to replace anything that requires rigorous thought or reasoning quite yet because it is still very prone to confidently hallucinating wrong answers. LLMs should act as an atlas and not a map (see: [[thoughts/plurality]])
 
 ## End-user programming
 
