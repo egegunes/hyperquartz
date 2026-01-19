@@ -5,9 +5,7 @@ tags:
   - seed
 ---
 
-Network block device (NBD) is a network protocol that can be used to forward a block device (typically a hard disk or partition) from one machine to a second machine
-
-We can think of a block device as a big array of bytes that file system drivers can build file/directory support on top of
+Network block device (NBD) is a network protocol that can be used to forward a [[thoughts/block device]] (typically a hard disk or partition) from one machine to a second machine
 
 A network block device is realized by three components:
 

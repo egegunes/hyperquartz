@@ -74,3 +74,11 @@ Two opposing forces to this:
 2.  Humans tend to mimic the interests of those around them (see: [[thoughts/mimetic|memetic thinking]])
 
 We can reach a sort of equilibrium by writing and doing [[thoughts/building in public|things in public]].
+
+## As shooting a documentary
+
+[Source](https://www.henrikkarlsson.xyz/p/on-the-preparations-before-writing)
+
+> I would be tempted to start writing the essay, but that would be a mistake. Everyone is different, but for me, writing essays is like shooting a documentary. I need to record the raw footage _before_ I sit down and edit the film. And I want to have more footage than I will use, often _a lot_ more.
+
+> If I _think_ I’m writing the essay, I get all tense and start polishing the prose and put in way too much effort into ideas and stories that might not deserve to be in the essay. And when I do that, I get reluctant to cut the material, which means the essay gets bogged down with mediocre stuff. I need to write rough notes and so on, so that I can go really fast and try many ideas and see them in high resolution, before I edit together the essay and polish the prose

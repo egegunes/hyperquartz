@@ -79,3 +79,6 @@ draft: true
 - how much company do i like?
 	- actually most of my hobbies are pretty solitary and i like being locked in for a lot of them
 
+
+
+https://www.virginiavalian.org/publications/work
