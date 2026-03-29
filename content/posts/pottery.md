@@ -65,6 +65,7 @@ Mostly learned from hours at the wheel and in the studio. A collection of observ
 		- being in dialogue with the clay, knowing when you can push it further, when its tired, knowing how much clay you have left in the walls, hearing the sound of clay thats just about too thin to trim any more
 			- cant collar too aggressively, cant belly out too aggressively, cant pull too aggressively
 		- being in dialogue with your body, knowing where your hands are when you can't see them, knowing if your elbow is pointed up to execute a straight pull, knowing how much pressure to apply if at all
+	- check the clay often, making sure its centered at every stage
 
 ### Appendix
 
