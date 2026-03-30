@@ -183,7 +183,7 @@ When it's my turn behind the wheel to drive back up, she tells me I clutch out t
 
 ---
 
-We're up at Thunderhill again, this time on the west side. It's about three weeks before Sonoma.
+We're up at Thunderhill again for a practice track day, this time on the west side. It's about three weeks before Sonoma.
 
 S had signed me up for the beginner group. We're told upon arrival that the assignments had been reshuffled and I was actually in intermediate. Grid time in an hour. Mild panic sets in; I had a plan for the day and it was gone.
 
@@ -260,7 +260,9 @@ My right hand is on the shift knob and I listen for the 5k RPM and not any highe
 
 Both of us keep full throttle through the straight leading up to 11. I know he brakes early so I strategically take the wide entry for the double apex. Brake, blip, shift down, turn.
 
-For just a brief moment, he's 3 car lengths ahead. I unwind and slam the throttle. We're on the main straight and 3 car lengths turn to 2 then 1. I pass the E36 just as we cross the start line again. I let out a yell. 2:34.
+For just a brief moment, he's 3 car lengths ahead. I unwind and slam the throttle. We're on the main straight and 3 car lengths turn to 2 then 1. I pass the E36 just as we cross the start line again. I let out a yell.
+
+2:34.
 
 ---
 
@@ -294,7 +296,9 @@ I pull into lane 36 and leave the car in neutral. S skates out to meet me after 
 
 "2:28? I honestly didn't think that was possible in this car"
 
-I chuckle. *"I'm not sure I could explain it. But hey, I think 2:25 is possible. Next Sonoma race for sure."*
+I chuckle.
+
+*"I'm not sure I could explain it. But hey, I think 2:25 is possible. Next Sonoma race for sure."*
 
 ![[thoughts/images/post_lap.jpeg|204]]
 
