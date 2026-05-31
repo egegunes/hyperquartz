@@ -32,14 +32,11 @@ export const sharedPageComponents: SharedLayout = {
 }
 
 const left = [
-  Component.PageTitle(),
-  Component.MobileOnly(Component.Spacer()),
   Component.Flex({
+    gap: "0.5rem",
     components: [
-      {
-        Component: Component.Search(),
-        grow: true,
-      },
+      { Component: Component.PageTitle(), grow: true },
+      { Component: Component.Search() },
       { Component: Component.Darkmode() },
     ],
   }),
@@ -50,20 +47,7 @@ const left = [
 export const defaultContentPageLayout: PageLayout = {
   beforeBody: [Component.ArticleTitle(), Component.ContentMeta(), Component.TagList()],
   left,
-  right: [
-    Component.DesktopOnly(
-      Component.Graph({
-        localGraph: {
-          showTags: false,
-        },
-        globalGraph: {
-          showTags: false,
-        },
-      }),
-    ),
-    Component.DesktopOnly(Component.TableOfContents()),
-    Component.Backlinks(),
-  ],
+  right: [Component.DesktopOnly(Component.TableOfContents()), Component.Backlinks()],
 }
 
 // components for pages that display lists of pages  (e.g. tags or folders)

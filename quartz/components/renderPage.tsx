@@ -103,7 +103,12 @@ function renderTranscludes(
                 tagName: "a",
                 properties: { href: inner.properties?.href, class: ["internal", "transclude-src"] },
                 children: [
-                  { type: "text", value: i18n(cfg.locale).components.transcludes.linkToOriginal },
+                  {
+                  type: "text",
+                  value:
+                    page.frontmatter?.title ??
+                    i18n(cfg.locale).components.transcludes.linkToOriginal,
+                },
                 ],
               },
             ]
@@ -146,7 +151,12 @@ function renderTranscludes(
               tagName: "a",
               properties: { href: inner.properties?.href, class: ["internal", "transclude-src"] },
               children: [
-                { type: "text", value: i18n(cfg.locale).components.transcludes.linkToOriginal },
+                {
+                  type: "text",
+                  value:
+                    page.frontmatter?.title ??
+                    i18n(cfg.locale).components.transcludes.linkToOriginal,
+                },
               ],
             },
           ]
@@ -176,7 +186,12 @@ function renderTranscludes(
               tagName: "a",
               properties: { href: inner.properties?.href, class: ["internal", "transclude-src"] },
               children: [
-                { type: "text", value: i18n(cfg.locale).components.transcludes.linkToOriginal },
+                {
+                  type: "text",
+                  value:
+                    page.frontmatter?.title ??
+                    i18n(cfg.locale).components.transcludes.linkToOriginal,
+                },
               ],
             },
           ]
@@ -236,7 +251,6 @@ export function renderPage(
     <html lang={lang} dir={direction}>
       <Head {...componentData} />
       <body data-slug={slug}>
-        <DappledLight />
         <div id="quartz-root" class="page">
           <Body {...componentData}>
             {LeftComponent}
@@ -272,51 +286,4 @@ export function renderPage(
   )
 
   return "<!DOCTYPE html>\n" + render(doc)
-}
-
-function DappledLight() {
-  return (
-    <div id="dappled-light">
-      <div id="glow"></div>
-      <div id="glow-bounce"></div>
-      <div class="perspective">
-        <div id="leaves"></div>
-        <div id="blinds">
-          <div class="shutters">
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-            <div class="shutter"></div>
-          </div>
-          <div class="vertical">
-            <div class="bar"></div>
-            <div class="bar"></div>
-          </div>
-        </div>
-      </div>
-      <div id="progressive-blur">
-        <div></div>
-        <div></div>
-      </div>
-    </div>
-  )
 }

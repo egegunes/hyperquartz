@@ -30,27 +30,29 @@ const config: QuartzConfig = {
         code: "JetBrains Mono",
       },
       colors: {
+        // letterpress poster: deep navy + vermilion on warm paper
         lightMode: {
-          light: "#fffdfa",
-          lightgray: "#e1daca",
-          gray: "#9c9384",
-          darkgray: "#2A354B",
-          dark: "#08142C",
-          secondary: "#274B75",
-          tertiary: "#84a59d",
-          highlight: "rgba(143, 159, 169, 0.15)",
-          textHighlight: "#fff23688",
+          light: "#f5eedd", // warm letterpress paper
+          lightgray: "#e3d9c0", // aged paper borders / code bg
+          gray: "#9a8e76", // muted warm gray (dates, line numbers)
+          darkgray: "#2d4673", // navy ink body text (reads clearly blue, not black)
+          dark: "#16294e", // deep navy headings
+          secondary: "#284d78", // navy links / title / primary accent
+          tertiary: "#c8482b", // bright orange-red (hover, active, graph)
+          highlight: "rgba(200, 72, 43, 0.1)", // faint vermilion ink wash
+          textHighlight: "#f4c84b88", // warm yellow marker
         },
+        // cyanotype: warm cream + gold on deep prussian blue
         darkMode: {
-          light: "#0c0f14",
-          lightgray: "#1D232D",
-          gray: "#5A657B",
-          darkgray: "#d4d4d4",
-          dark: "#ebebec",
-          secondary: "#7188A9",
-          tertiary: "#84a59d",
-          highlight: "rgba(143, 159, 169, 0.15)",
-          textHighlight: "#b3aa0288",
+          light: "#06182f", // deep prussian blue background
+          lightgray: "#122845", // lighter prussian borders / code bg
+          gray: "#7191b8", // muted steel-blue (dates, line numbers)
+          darkgray: "#caddf4", // cyanotype light-blue body text
+          dark: "#eef4fc", // bright blue-white (headings)
+          secondary: "#8fb9de", // luminous sky-cyan links / title
+          tertiary: "#e0bd6e", // toned-botanical gold (hover, active, graph)
+          highlight: "rgba(143, 180, 216, 0.12)", // faint cyan wash
+          textHighlight: "#d9b15f55", // warm gold marker
         },
       },
     },
@@ -90,7 +92,7 @@ const config: QuartzConfig = {
       Plugin.Favicon(),
       Plugin.NotFoundPage(),
       // // Comment out CustomOgImages to speed up build time
-      Plugin.CustomOgImages(),
+      // Plugin.CustomOgImages(),
     ],
   },
 }

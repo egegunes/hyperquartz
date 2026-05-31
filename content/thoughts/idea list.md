@@ -7,11 +7,41 @@ tags:
 
 ## Technical
 
-- block based text editor
-	- allow you to rip paragraph apart and rearrange sentences spatially
-		- paragraph should be able to have hierarchy like bullet points
-		- the 'bullet points' should be purely visual (easy toggle to turn it into paragraph/prose mode)
-	- column based drafts throughout history (save as draft button but also rewindable history)
+- LLM-based block based text editor - writers block
+	- i am an outline based writer
+		- i convert parts to prose
+		- want like a two-column layout which connects the bullets to the prose
+		- clicking on one side scrolls the other to the same point
+		- same with re-arranging paragraphs <> bullets
+	- on the prose side: allow you to rip paragraph apart and rearrange sentences spatially
+		- should not be fully linear, more like a canvas maybe? 
+			- or still linear but have a 'stash' section for good sentences/parts i want to keep
+			- good hover animations for when you want to connect a dragged sentence/paragraph to another
+	- auto-save drafts throughout history (save as draft button but also rewindable history)
+		- at important semantic points
+		- history scrubber basically
+	- sharing for feedback
+		- creates a distinct share link
+		- can leave comments + suggestions a la google docs
+			- these show up on the base document as 'layers' you can toggle on and off
+			- how to keep these stable wrt edits on the underlying piece?
+				- span markers probably
+	- LLM features
+		- i want 'sprites' for certain things that are like little fairies that leave comments -> uses the same feedback mechanism as sharing
+			- probably doesnt kick in until you ask
+			- voice consistency
+			- grammar
+			- big picture organizational questions / scope of piece
+		- sprite should also be user configurable
+			- its just an agent with the ability to read piece
+				- tool for leaving comments
+				- tool for suggesting edits
+				- tool for maybe searching the web
+	- this will just be a tool for me and my friends
+		- but having an 'account' is nice (google login?)
+		- save API keys for claude/chatgpt so i dont use my own : )
+	- lets think of frontend text editor frameworks that will let us get these properties
+	- want to use durable objects for storage / communication
 - fuzzy rip grep
 - hoogle for rdf shapes
 - optimizing network topology for crdts

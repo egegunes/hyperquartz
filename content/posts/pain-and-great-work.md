@@ -27,6 +27,18 @@ draft: true
 			- when you are the only person who can do something, do you have a responsibility to do it?
 			- Shinji must ultimately decide whether life's pain is worth experiencing for the possibility of connection and meaning.
 				- The Human Instrumentality Project offers an escape from individual suffering by dissolving all boundaries between people - essentially eliminating the self and the pain that comes with it.
+		- 3 idiots
+			- when is it worth leaving/enduring suboptimal conditions
+				- with farhan, parents that believe in traditional success over happiness
+					- no amount of effort or mindset shift makes engineering his calling -- he eventually confronts his father on doing the less successful but happier thing
+						- tk: what will he do if the 'happier thing' becomes hard?
+						- plays on relies on father being eventually rational and understanding of his child's happiness rather than his own
+				- with raju, severe financial struggles and being the sole provider for the family
+					- his mindset is one rooted in fear
+					- tk: how does this work if things dont work out? what if the fear is valid?
+				- joy and the principals son are the examples of how 'life is a race' can kill in a system with no flexibility
+				- "all is well" not as denial but giving the heart the courage to act
+					- change what you can (your relationship to the work, your fear, the rigidity around you), leave what you can't (a path that was never yours)
 	- see also: [[thoughts/Buddhist Economics|Buddhist Economics]]
 - how much great work has gone undeveloped because we didnt push someone hard enough?
 	- fletcher in the movie implies that we lose a lot because of this
@@ -46,7 +58,6 @@ draft: true
 		- 
 - can obsession ever be healthy?
 	- seasonality re: robin sloan
-
 - being Serious (tm) is good actually
 	- see Timothée Chalamet acceptance speech
 	- its a commitment!! and admitting the possibility of failure!!
@@ -54,6 +65,12 @@ draft: true
 
 - in many cases, it is the doing of the work that matters
 	- e.g. ai making ppl think less is bad actually
+
+- on feeling enough
+	- An insecurity is a comparative judgement that you believe reflects on your worth. It is believing that you are “too much” or “not enough” in some regard, compared to other people or an external standard that you have internalized. But this alone is not enough to make an insecurity. You have to also believe that this somehow makes you less deserving of love.
+		- https://altered.substack.com/p/insecurity
+		- Insecurities form by installing external judges/evaluators _because you think they’re better judges than you_ and you want to maximize your chances of getting love and acceptance from your tribe. They may not even be right, but you believed them.
+			- part of getting over your insecurity is in believing in your own evaluation more
 
 ## simon sarris efforts and goals and joy
 - I find it ideal to always have more ambitions, plans, and projects than one could possibly accomplish. Aspirations — even unlikely ones, maybe _especially_ unlikely ones — are an essential part of living well. When we are at our most ailing, we are reduced to thinking and talking only of our ailments. When we are at our most vigorous, our most alive, we think and talk of our goals and aspirations. Over long time frames, the pessimist becomes an unobservant man, and the optimist creates the world.

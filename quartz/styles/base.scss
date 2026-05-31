@@ -605,6 +605,11 @@ ol.overflow {
   ul {
     padding-left: 1rem;
   }
+
+  // link back to the source page shows the page title in italics
+  a.transclude-src {
+    font-style: italic;
+  }
 }
 
 .katex-display {
