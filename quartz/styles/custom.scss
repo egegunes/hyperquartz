@@ -183,6 +183,43 @@ a.see-more {
   }
 }
 
+// ─── Art-deco two-ink accents (vermilion in light, gold in dark via --tertiary) ───
+
+// Footnote reference markers read as the "second ink"
+.data-footnote-ref,
+a[data-footnote-ref] {
+  color: var(--tertiary);
+  font-weight: 600;
+}
+
+// The * * * scene break becomes a vermilion mark instead of muted gray
+hr:after {
+  color: var(--tertiary);
+}
+
+// Inline article links (the ones that used to get the pill wash): a vermilion
+// "second ink" underline instead. Scoped to article prose so nav/sidebar
+// internal links are untouched.
+article a.internal {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  text-decoration: underline;
+  text-decoration-color: var(--tertiary);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
+
+  // image embeds and tag chips opt out of the underline
+  &:has(> img) {
+    text-decoration: none;
+  }
+  // tag chips keep their vermilion pill (matches TagList.css)
+  &.tag-link {
+    text-decoration: none;
+    background-color: color-mix(in srgb, var(--tertiary) 12%, transparent);
+  }
+}
+
 // smooth the light/dark theme swap. Bare `*` has zero specificity, so any
 // element with its own `transition` rule overrides this rather than losing it.
 * {
@@ -267,14 +304,14 @@ body.animation-ready #quartz-body {
     border: none;
     background: none;
     cursor: pointer;
-    color: var(--secondary);
+    color: var(--tertiary);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: color 0.2s ease;
 
     &:hover {
-      color: color-mix(in srgb, var(--secondary) 78%, white);
+      color: color-mix(in srgb, var(--tertiary) 80%, white);
     }
 
     svg {
@@ -299,7 +336,7 @@ body.animation-ready #quartz-body {
       transition: background 0.1s ease;
 
       &.played {
-        background: var(--secondary);
+        background: var(--tertiary);
       }
     }
   }

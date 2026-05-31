@@ -47,9 +47,17 @@ TagList.css = `
 
 a.internal.tag-link {
   border-radius: 8px;
-  background-color: var(--highlight);
+  /* vermilion "second ink" chips: red text on a faint red wash */
+  color: var(--tertiary);
+  background-color: color-mix(in srgb, var(--tertiary) 12%, transparent);
   padding: 0.2rem 0.4rem;
   margin: 0 0.1rem;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+a.internal.tag-link:hover {
+  color: var(--tertiary);
+  background-color: color-mix(in srgb, var(--tertiary) 20%, transparent);
 }
 `
 

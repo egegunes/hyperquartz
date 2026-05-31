@@ -42,7 +42,7 @@ const config: QuartzConfig = {
           highlight: "rgba(200, 72, 43, 0.1)", // faint vermilion ink wash
           textHighlight: "#f4c84b88", // warm yellow marker
         },
-        // cyanotype: warm cream + gold on deep prussian blue
+        // cyanotype: warm cream + vermilion accent on deep prussian blue
         darkMode: {
           light: "#06182f", // deep prussian blue background
           lightgray: "#122845", // lighter prussian borders / code bg
@@ -50,9 +50,9 @@ const config: QuartzConfig = {
           darkgray: "#caddf4", // cyanotype light-blue body text
           dark: "#eef4fc", // bright blue-white (headings)
           secondary: "#8fb9de", // luminous sky-cyan links / title
-          tertiary: "#e0bd6e", // toned-botanical gold (hover, active, graph)
-          highlight: "rgba(143, 180, 216, 0.12)", // faint cyan wash
-          textHighlight: "#d9b15f55", // warm gold marker
+          tertiary: "#e0552f", // bold vermilion (hover, active, graph)
+          highlight: "rgba(224, 85, 47, 0.14)", // faint vermilion wash
+          textHighlight: "#c9542f55", // muted vermilion marker
         },
       },
     },
