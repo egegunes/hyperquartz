@@ -347,3 +347,174 @@ body.animation-ready #quartz-body {
     font-variant-numeric: tabular-nums;
   }
 }
+
+// index-only decorative Three.js dappled-light scene (see dappledLight.inline).
+// komorebi 3-tone palette: deep shadow -> warm gold light -> bright wall.
+// Theme-aware so both modes read well (warm gold on navy/prussian).
+:root {
+  --komorebi-shadow: #233452;
+  --komorebi-mid: #e89a39; // warm amber-orange rim
+  --komorebi-light: #f5eedd;
+  --komorebi-frame: var(--komorebi-shadow); // frame = the dark ink in light mode
+  --komorebi-gap: var(--komorebi-light); // padding gap fill
+  --komorebi-center: 0.38; // tonal balance: light wall w/ dark dapples
+}
+// nighttime: moonlit wall (light blue) with dark tree shadows, cool glow
+[saved-theme="dark"] {
+  --komorebi-shadow: #0c2038; // tree shadow / unlit wall (deep night blue)
+  --komorebi-mid: #6a86b0; // soft penumbra at shadow edges — dimmer than the wall
+  --komorebi-light: #83a1c9; // moonlit wall — the main light color (light blue)
+  --komorebi-frame: var(--komorebi-light); // frame = the moonlight color at night
+  --komorebi-gap: var(--komorebi-shadow); // padding gap fill (dark at night)
+  --komorebi-center: 0.38;
+}
+
+// Reserve the box up-front (fixed height + border) so there's no layout shift
+// while Three.js lazy-loads; the canvas fades in once rendered.
+.dappled-scene {
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  height: 180px;
+  margin: 0 0 1.5rem;
+  padding: 2px; // gap between the canvas and the border (matches border width)
+  border: 2px solid var(--komorebi-frame); // frame contrasts the page in both themes
+  overflow: hidden;
+  background-color: var(--komorebi-gap);
+
+  & > .dappled-canvas {
+    display: block;
+    image-rendering: pixelated; // crisp nearest-neighbor upscale of the low-res render
+    opacity: 0;
+    animation: dappled-fade-in 0.8s ease forwards;
+  }
+
+  // on mobile the header stacks directly above the content, so add breathing room
+  @media all and ($mobile) {
+    margin-top: 1.5rem;
+  }
+}
+
+@keyframes dappled-fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+// dappled-light debug panel (Konami toggle: up up down down left right left right)
+.dappled-debug {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  width: 230px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 0.75rem;
+  // site theme vars so the panel flips with light/dark mode
+  background: color-mix(in srgb, var(--light) 95%, transparent);
+  color: var(--dark);
+  border: 1px solid var(--dark);
+  border-radius: 0;
+  font-family: var(--codeFont, monospace);
+  font-size: 0.72rem;
+
+  // live sparkline charts (fps, wind)
+  .dappled-chart {
+    margin: 0 0 0.5rem;
+
+    span {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--secondary);
+      opacity: 0.9;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 30px;
+      background: color-mix(in srgb, var(--secondary) 10%, transparent);
+    }
+  }
+
+  // section headers
+  .dappled-debug-h {
+    margin: 0.8rem 0 0.3rem;
+    padding-bottom: 2px;
+    border-bottom: 1px solid var(--lightgray);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.66rem;
+    opacity: 0.7;
+
+    &:first-of-type {
+      margin-top: 0.3rem;
+    }
+  }
+
+  label {
+    display: block;
+    margin: 0.4rem 0;
+
+    span {
+      display: block;
+      margin-bottom: 3px;
+      opacity: 0.85;
+    }
+
+    // thin slider track + small thumb
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 10px;
+      background: transparent;
+      cursor: pointer;
+
+      &::-webkit-slider-runnable-track {
+        height: 2px;
+        background: color-mix(in srgb, var(--gray) 50%, transparent);
+      }
+      &::-moz-range-track {
+        height: 2px;
+        background: color-mix(in srgb, var(--gray) 50%, transparent);
+      }
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 9px;
+        height: 9px;
+        margin-top: -3.5px;
+        border-radius: 50%;
+        background: var(--secondary);
+      }
+      &::-moz-range-thumb {
+        width: 9px;
+        height: 9px;
+        border: none;
+        border-radius: 50%;
+        background: var(--secondary);
+      }
+    }
+  }
+
+  // layer / dither toggles: checkbox inline with label
+  label.dappled-debug-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0.35rem 0;
+    cursor: pointer;
+
+    input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+      accent-color: var(--secondary);
+    }
+    span {
+      display: inline;
+      margin: 0;
+      opacity: 0.95;
+    }
+  }
+}
