@@ -78,8 +78,7 @@ const FRAG = `#extension GL_OES_standard_derivatives : enable
   float branchLSystem(vec2 buv, vec2 disp){
     buv.x += uParallax * 0.04;
     buv += disp * 0.5; // wind sway
-    float d = 1e9;
-    float nearW = 0.02; // radius of the closest limb
+    float d = 1e9; // signed distance to the nearest limb surface (negative = inside)
     float nearDepth = 0.0; // depth (0 near .. 1 far) of the closest limb
     float rowScale = 1.0 / float(MAXSEG);
     for (int i = 0; i < MAXSEG; i++){
@@ -95,19 +94,18 @@ const FRAG = `#extension GL_OES_standard_derivatives : enable
       float r = mix(dec16(t2.rg), dec16(t2.ba), h) * uWidScale;
       float dist = length(pa - ba * h) - r;
       if (dist < d) {
-        d = dist; nearW = r;
+        d = dist;
         nearDepth = dec16(texture2D(uSegTex, vec2(3.5 / 4.0, row)).rg);
       }
     }
-    // depth = distance from the wall: far limbs cast softer, fainter (dithered) shadows
-    float soft = 0.003 + nearDepth * 0.05;
-    float cover = 1.0 - smoothstep(0.0, soft, d);
-    float thinness = 1.0 - smoothstep(0.004, 0.022, nearW);
-    float darkness = max(thinness, nearDepth * 0.9); // thin OR far -> lighter / dithers
-    // cap the floor so thin/far limbs land in the gold/dither band (~mid light)
-    // instead of being pushed all the way to lit paper by the contrast curve
-    float floorT = mix(0.03, 0.32, darkness);
-    return mix(1.0, floorT, cover);
+    // penumbra: the shadow darkens across a band whose half-width grows with the
+    // caster's distance (depth). a thick limb is wider than the band, so its core
+    // reaches full umbra while the edges lighten; a thin twig is narrower than the
+    // band, so its penumbras overlap and it never fully darkens (dithers on its own).
+    float pen = 0.006 + nearDepth * 0.06;
+    float shadow = 1.0 - smoothstep(-pen, pen, d); // 1 deep inside -> 0 outside
+    float umbra = mix(0.03, 0.34, nearDepth); // far limbs' deepest shadow is fainter
+    return mix(1.0, umbra, shadow);
   }
   // foliage: blobby noise. blur -> softer penumbra + fainter shadow. cover (0..1)
   // biases density: high near the scene's canopy origin, sparse in the open area.
@@ -335,6 +333,7 @@ function initScene(container: HTMLElement) {
     curl: 0.3, // curl carried along a leader (springiness)
     split3: 0.3, // P(3 children) at a split, else 2
     forkProb: 0.7, // P a node forks (else the leader extends -> variable internodes)
+    depthDrift: 0.4, // how much branches wander in depth as they fork (envelop the trunk)
     leader: 0.618, // leader's share of the conserved cross-section AREA (1/phi)
     golden: 1, // 0 = random sides, 1 = golden-angle phyllotaxis placement
     conserve: 0.95, // total child area / parent area (<= 1; the taper)
@@ -355,6 +354,9 @@ function initScene(container: HTMLElement) {
     const minW = tree.endPx / (2 * pxPerUnit) // radius at which a limb is ~endPx px thick
     const GOLDEN = Math.PI * (3 - Math.sqrt(5)) // golden angle ~137.5deg (phyllotaxis)
     const INVPHI = 2 / (1 + Math.sqrt(5)) // 1/phi ~0.618
+    // depth random-walk: the tree is a 3D volume. the trunk holds a central depth;
+    // branches drift toward/away from the wall as they fork, enveloping it.
+    const drift = (depth: number, amt: number) => Math.min(0.98, Math.max(0.02, depth + (rng() - 0.5) * amt))
 
     // pipe model: grow a limb (length scales with width), then split, conserving
     // CROSS-SECTION AREA (da Vinci) across 2-3 children. a phyllotaxis "phase"
@@ -373,14 +375,15 @@ function initScene(container: HTMLElement) {
       // not every node forks: sometimes the leader just extends (full width) ->
       // variable internode length, so the run before the first fork varies
       if (rng() >= tree.forkProb) {
-        grow(ex, ey, a, Math.sqrt(totalA), curl, phase + GOLDEN, depth)
+        grow(ex, ey, a, Math.sqrt(totalA), curl, phase + GOLDEN, drift(depth, tree.depthDrift * 0.25))
         return
       }
       const n = rng() < tree.split3 ? 3 : 2
       // leader keeps 1/phi of the area (the golden-ratio split real branches show)
       const leaderA = totalA * (tree.leader * (0.92 + rng() * 0.16))
       const wLeader = Math.sqrt(Math.min(totalA, leaderA))
-      grow(ex, ey, a, wLeader, curl, phase + GOLDEN, depth) // phase spirals by golden angle
+      // leader stays close to the central column; side branches reach out in depth
+      grow(ex, ey, a, wLeader, curl, phase + GOLDEN, drift(depth, tree.depthDrift * 0.25))
       let remA = Math.max(0, totalA - wLeader * wLeader)
       for (let k = 0; k < n - 1; k++) {
         const ac = k === n - 2 ? remA : remA * (0.45 + rng() * 0.25)
@@ -393,7 +396,7 @@ function initScene(container: HTMLElement) {
         const side = lat >= 0 ? 1 : -1
         const thin = 1 - Math.min(1, wc / Math.max(wEnd, 1e-6))
         const sa = a + side * (0.35 + thin * 0.55) + (rng() - 0.5) * 0.15
-        grow(ex, ey, sa, wc, (rng() - 0.5) * tree.curl, ph, depth)
+        grow(ex, ey, sa, wc, (rng() - 0.5) * tree.curl, ph, drift(depth, tree.depthDrift))
       }
     }
     // 5 scene archetypes for cohesion: all trees in a scene enter from the same
@@ -429,11 +432,13 @@ function initScene(container: HTMLElement) {
     for (let i = 0; i < nTrees; i++) {
       if (segs.length >= MAXSEG) break
       const edge = scene.edges[i % scene.edges.length] // cover each origin edge
-      const depth = nTrees > 1 ? i / (nTrees - 1) : 0 // 0 = near dominant, 1 = far
-      const [x, y, ang] = rootForEdge(edge, depth)
-      // near boughs thick & dominant; far boughs thinner (and rendered fainter/softer)
-      const w = tree.trunkWidth * (1 - depth * 0.5) * (0.9 + rng() * 0.2)
-      grow(x, y, ang, w, (rng() - 0.5) * tree.curl, rng() * Math.PI * 2, depth)
+      const role = nTrees > 1 ? i / (nTrees - 1) : 0 // 0 = dominant, 1 = minor
+      // dominant tree is thick & sits nearer the wall; minor trees thinner & farther.
+      // (this is the central depth of each trunk; branches drift around it.)
+      const base = 0.3 + role * 0.3
+      const [x, y, ang] = rootForEdge(edge, role)
+      const w = tree.trunkWidth * (1 - role * 0.5) * (0.9 + rng() * 0.2)
+      grow(x, y, ang, w, (rng() - 0.5) * tree.curl, rng() * Math.PI * 2, base)
     }
     segCount = Math.min(segs.length, MAXSEG)
     posScale = aspect + 2
@@ -662,6 +667,7 @@ function initScene(container: HTMLElement) {
   addSlider("curl", 0, 0.8, 0.02, () => tree.curl, (v) => { tree.curl = v; regen() })
   addSlider("P(3 split)", 0, 1, 0.05, () => tree.split3, (v) => { tree.split3 = v; regen() })
   addSlider("fork prob", 0.3, 1, 0.05, () => tree.forkProb, (v) => { tree.forkProb = v; regen() })
+  addSlider("depth drift", 0, 0.9, 0.05, () => tree.depthDrift, (v) => { tree.depthDrift = v; regen() })
   addSlider("leader share", 0.4, 0.95, 0.02, () => tree.leader, (v) => { tree.leader = v; regen() })
   addSlider("golden phyllotaxis", 0, 1, 0.05, () => tree.golden, (v) => { tree.golden = v; regen() })
   addSlider("width conserve", 0.7, 1, 0.01, () => tree.conserve, (v) => { tree.conserve = v; regen() })
