@@ -327,12 +327,14 @@ function initScene(container: HTMLElement) {
   const tree = {
     sceneType: -1, // -1 = random per seed; 0..4 = top / top+left / top+right / bot+right / bot+left
     leafBias: 1.4, // ramp strength of the canopy toward the origin side (0 = uniform)
+    rootOffset: 0.9, // how far roots sit off-canvas (bigger = canopy fills the edge)
     nTrees: 6,
     trunkWidth: 0.035, // root bough radius (everything derives from this)
     lenRatio: 16, // segment length ~= lenRatio * current width (bigger = longer limbs)
     maxLen: 0.4, // cap so thick boughs curve over several segments
     curl: 0.3, // curl carried along a leader (springiness)
     split3: 0.3, // P(3 children) at a split, else 2
+    forkProb: 0.7, // P a node forks (else the leader extends -> variable internodes)
     leader: 0.618, // leader's share of the conserved cross-section AREA (1/phi)
     golden: 1, // 0 = random sides, 1 = golden-angle phyllotaxis placement
     conserve: 0.95, // total child area / parent area (<= 1; the taper)
@@ -367,8 +369,14 @@ function initScene(container: HTMLElement) {
       const ey = y + Math.sin(a) * len
       const wEnd = width * 0.97 // gentle taper within the segment
       segs.push([x, y, ex, ey, width, wEnd, depth])
-      const n = rng() < tree.split3 ? 3 : 2
       const totalA = wEnd * wEnd * tree.conserve
+      // not every node forks: sometimes the leader just extends (full width) ->
+      // variable internode length, so the run before the first fork varies
+      if (rng() >= tree.forkProb) {
+        grow(ex, ey, a, Math.sqrt(totalA), curl, phase + GOLDEN, depth)
+        return
+      }
+      const n = rng() < tree.split3 ? 3 : 2
       // leader keeps 1/phi of the area (the golden-ratio split real branches show)
       const leaderA = totalA * (tree.leader * (0.92 + rng() * 0.16))
       const wLeader = Math.sqrt(Math.min(totalA, leaderA))
@@ -405,15 +413,17 @@ function initScene(container: HTMLElement) {
     const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v))
     // dominant bough (depth ~0) anchors tightly at the thirds focus; farther boughs
     // (higher depth) spread more. roots stay on the origin side -> negative space.
+    const off = tree.rootOffset // push roots off-canvas so the bare trunk section is
+    // off-screen and the already-forked canopy fills the visible edge
     const rootForEdge = (edge: number, depth: number): [number, number, number] => {
       const spread = 0.1 + depth * 0.45 // tight for the near dominant, looser for far
       const fx = clamp(scene.fx + (rng() - 0.5) * spread, 0.04, 0.96)
-      if (edge === 2) return [fx * aspect, 1.05, -Math.PI / 2 + (rng() - 0.5) * 0.6]
-      if (edge === 3) return [fx * aspect, -0.05, Math.PI / 2 + (rng() - 0.5) * 0.6]
+      if (edge === 2) return [fx * aspect, 1.0 + off, -Math.PI / 2 + (rng() - 0.5) * 0.6]
+      if (edge === 3) return [fx * aspect, -off, Math.PI / 2 + (rng() - 0.5) * 0.6]
       const yc = scene.top ? 0.7 : 0.3 // anchor height on the origin side
       const y = clamp(yc + (rng() - 0.5) * spread, 0.05, 0.95)
-      if (edge === 0) return [-0.05, y, (rng() - 0.5) * 0.6]
-      return [aspect + 0.05, y, Math.PI + (rng() - 0.5) * 0.6]
+      if (edge === 0) return [-off, y, (rng() - 0.5) * 0.6]
+      return [aspect + off, y, Math.PI + (rng() - 0.5) * 0.6]
     }
     const nTrees = Math.max(1, Math.round(tree.nTrees))
     for (let i = 0; i < nTrees; i++) {
@@ -643,6 +653,7 @@ function initScene(container: HTMLElement) {
   addHeader("tree (L-system)")
   addButton("reshuffle tree", () => { treeSeed = Math.floor(Math.random() * 1e9); regen() })
   addSlider("scene (-1=rand)", -1, 4, 1, () => tree.sceneType, (v) => { tree.sceneType = v; regen() })
+  addSlider("root offset", 0, 1.6, 0.02, () => tree.rootOffset, (v) => { tree.rootOffset = v; regen() })
   addSlider("leaf bias", 0, 3, 0.05, () => tree.leafBias, (v) => { tree.leafBias = v })
   addSlider("trees", 1, 12, 1, () => tree.nTrees, (v) => { tree.nTrees = v; regen() })
   addSlider("trunk width", 0.02, 0.09, 0.002, () => tree.trunkWidth, (v) => { tree.trunkWidth = v; regen() })
@@ -650,6 +661,7 @@ function initScene(container: HTMLElement) {
   addSlider("max seg len", 0.06, 0.7, 0.01, () => tree.maxLen, (v) => { tree.maxLen = v; regen() })
   addSlider("curl", 0, 0.8, 0.02, () => tree.curl, (v) => { tree.curl = v; regen() })
   addSlider("P(3 split)", 0, 1, 0.05, () => tree.split3, (v) => { tree.split3 = v; regen() })
+  addSlider("fork prob", 0.3, 1, 0.05, () => tree.forkProb, (v) => { tree.forkProb = v; regen() })
   addSlider("leader share", 0.4, 0.95, 0.02, () => tree.leader, (v) => { tree.leader = v; regen() })
   addSlider("golden phyllotaxis", 0, 1, 0.05, () => tree.golden, (v) => { tree.golden = v; regen() })
   addSlider("width conserve", 0.7, 1, 0.01, () => tree.conserve, (v) => { tree.conserve = v; regen() })
