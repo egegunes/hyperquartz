@@ -25,6 +25,13 @@ const VERT = `
 
 const FRAG = `#extension GL_OES_standard_derivatives : enable
   precision highp float;
+  #define MAXSEG 1024         // loop ceiling; actual count is uSegCount
+  uniform sampler2D uSegTex; // L-system segments packed as RGBA8 (16-bit), 3 texels/seg
+  uniform float uPosScale;   // decode: pos = raw * uPosScale - 1.0
+  uniform float uWidScale;   // decode: width = raw * uWidScale
+  uniform int uSegCount;     // number of live segments
+  uniform vec2 uLeafGrad;    // canopy gradient dir in uv space (toward the origin sides)
+  uniform float uLeafFall;   // ramp strength of leaf cover along the gradient
   uniform float uTime;       // real seconds (slow canopy drift)
   uniform vec2 uDisp[4];     // per-layer cumulative sway displacement
   uniform vec2 uResolution;
@@ -40,6 +47,8 @@ const FRAG = `#extension GL_OES_standard_derivatives : enable
   uniform vec4 uBlur;        // per-layer blur (distance): 0 sharp+dark -> 1 soft+faint
   uniform float uDither;     // 1 dithered, 0 hard
   uniform vec2 uSeed;        // random per-load offset into the noise field
+  uniform float uParallax;   // -1..1 (mouse x / device tilt); shifts layers by depth
+  uniform vec3 uFloor;       // per-layer floor top range (trunk, thick, thin); floor = blur^2 * top
   varying vec2 vUv;
 
   float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
@@ -61,38 +70,82 @@ const FRAG = `#extension GL_OES_standard_derivatives : enable
     for (int i = 0; i < 4; i++) { v += a * ridged(p); a *= 0.5; p = p * 1.97 + 3.3; }
     return v;
   }
-  // foliage: blobby noise. blur -> softer penumbra + fainter (less dark) shadow.
-  float leafLayer(vec2 buv, float scale, vec2 disp, float b, vec2 seed){
+  // unpack a 16-bit value stored across two RGBA8 channels ([0,1] each)
+  float dec16(vec2 c){ return (c.x * 255.0 * 256.0 + c.y * 255.0) / 65535.0; }
+  // shadow from the L-system branch segments (grown CPU-side, packed into a texture;
+  // segments are tapered capsules in buv space, x: 0..aspect, y: 0..1). we also grab
+  // the local limb radius at the nearest point so thin limbs dither.
+  float branchLSystem(vec2 buv, vec2 disp){
+    buv.x += uParallax * 0.04;
+    buv += disp * 0.5; // wind sway
+    float d = 1e9;
+    float nearW = 0.02; // radius of the closest limb
+    float nearDepth = 0.0; // depth (0 near .. 1 far) of the closest limb
+    float rowScale = 1.0 / float(MAXSEG);
+    for (int i = 0; i < MAXSEG; i++){
+      if (i >= uSegCount) break;
+      float row = (float(i) + 0.5) * rowScale;
+      vec4 t0 = texture2D(uSegTex, vec2(0.5 / 4.0, row)); // x0,y0
+      vec4 t1 = texture2D(uSegTex, vec2(1.5 / 4.0, row)); // x1,y1
+      vec4 t2 = texture2D(uSegTex, vec2(2.5 / 4.0, row)); // w0,w1
+      vec2 a = vec2(dec16(t0.rg), dec16(t0.ba)) * uPosScale - 1.0;
+      vec2 bb = vec2(dec16(t1.rg), dec16(t1.ba)) * uPosScale - 1.0;
+      vec2 pa = buv - a, ba = bb - a;
+      float h = clamp(dot(pa, ba) / max(dot(ba, ba), 1e-6), 0.0, 1.0);
+      float r = mix(dec16(t2.rg), dec16(t2.ba), h) * uWidScale;
+      float dist = length(pa - ba * h) - r;
+      if (dist < d) {
+        d = dist; nearW = r;
+        nearDepth = dec16(texture2D(uSegTex, vec2(3.5 / 4.0, row)).rg);
+      }
+    }
+    // depth = distance from the wall: far limbs cast softer, fainter (dithered) shadows
+    float soft = 0.003 + nearDepth * 0.05;
+    float cover = 1.0 - smoothstep(0.0, soft, d);
+    float thinness = 1.0 - smoothstep(0.004, 0.022, nearW);
+    float darkness = max(thinness, nearDepth * 0.9); // thin OR far -> lighter / dithers
+    // cap the floor so thin/far limbs land in the gold/dither band (~mid light)
+    // instead of being pushed all the way to lit paper by the contrast curve
+    float floorT = mix(0.03, 0.32, darkness);
+    return mix(1.0, floorT, cover);
+  }
+  // foliage: blobby noise. blur -> softer penumbra + fainter shadow. cover (0..1)
+  // biases density: high near the scene's canopy origin, sparse in the open area.
+  float leafLayer(vec2 buv, float scale, vec2 disp, float b, vec2 seed, float cover){
+    buv.x += uParallax * (0.15 + b) * 0.1; // depth-based parallax (far layers shift more)
     vec2 p = buv * scale + disp + seed;
     float soft = 0.05 + b * 0.30;
-    float floorT = b * 0.45;
-    float s = smoothstep(0.5 + soft, 0.5 - soft, fbm(p)); // 1 where leaf (low fbm)
+    float floorT = b * 0.38;
+    float thr = mix(0.85, 0.48, cover); // low cover -> high threshold -> few leaves
+    float s = smoothstep(thr + soft, thr - soft, fbm(p));
     return mix(1.0, floorT, s);
   }
   // branches: domain-warped, anisotropic ridged noise read as wandering limbs.
   // higher thick -> thinner branches; blur -> softer + fainter shadow.
-  float branchLayer(vec2 buv, float scale, vec2 disp, float thick, float b, vec2 seed){
+  float branchLayer(vec2 buv, float scale, vec2 disp, float thick, float b, vec2 seed, float topRange){
+    buv.x += uParallax * (0.15 + b) * 0.1; // depth-based parallax
     vec2 p = buv * scale + disp + seed;
-    p += (vec2(noise(p * 0.5 + 2.1), noise(p * 0.5 + 8.7)) - 0.5) * 1.6;
+    p += (vec2(noise(p * 0.5 + 2.1), noise(p * 0.5 + 8.7)) - 0.5) * 0.8; // gentle wander, not swirly ribbons
     mat2 R = mat2(0.86, -0.51, 0.51, 0.86);
-    float r = ridgedFbm(R * p * vec2(1.0, 0.42));
+    float r = ridgedFbm(R * p * vec2(1.0, 0.35)); // anisotropy = longer, connected limbs
     float soft = 0.03 + b * 0.22;
-    float floorT = b * 0.45;
     float s = smoothstep(thick, thick + soft, r); // 1 on the ridge (wood)
+    float floorT = b * b * topRange; // shadow fades with distance^2 toward topRange
     return mix(1.0, floorT, s);
   }
   // trunk: 1-2 near-vertical, mostly-straight thick lines at seeded x-positions
   // (explicit fixed-width bands, so they can't blow up into a slab). uv-space.
-  float trunkLayer(vec2 uv, vec2 disp, float thick, float b, vec2 seed){
+  float trunkLayer(vec2 uv, vec2 disp, float thick, float b, vec2 seed, float topRange){
     float lean = (noise(vec2(seed.y, uv.y * 0.6)) - 0.5) * 0.06; // gentle lean, mostly straight
-    float x = uv.x + lean;
+    float x = uv.x + lean + uParallax * 0.015; // slight parallax (trunk is the anchor)
     float halfw = 0.015 + (1.0 - thick) * 0.05;                  // line width (thick -> thinner)
     float c0 = fract(sin(seed.x * 0.017 + 1.3) * 43758.5453);    // line positions
     float c1 = fract(sin(seed.y * 0.023 + 4.7) * 43758.5453);
     float use2 = step(0.4, fract(sin(seed.x * 0.041) * 9871.0)); // ~60% chance of a 2nd line
     float d = min(abs(x - c0), mix(10.0, abs(x - c1), use2));    // distance to nearest line
     float s = 1.0 - smoothstep(halfw, halfw + 0.02 + b * 0.1, d);
-    return mix(1.0, b * 0.45, s);
+    float floorT = b * b * topRange;
+    return mix(1.0, floorT, s);
   }
   float bayer4(vec2 c){
     int x = int(mod(c.x, 4.0));
@@ -112,16 +165,22 @@ const FRAG = `#extension GL_OES_standard_derivatives : enable
     vec2 buv = vec2(uv.x * aspect, uv.y);
     float t = uTime;
 
-    // trunk + thick + thin branches as ridged limbs; leaves as blobby foliage
-    float l0 = mix(1.0, trunkLayer(uv, uDisp[0], 0.55, uBlur.x, uSeed), uLayerOn.x);
-    float l1 = mix(1.0, branchLayer(buv, 3.4, uDisp[1], 0.78, uBlur.y, uSeed + vec2(37.0, 19.0)), uLayerOn.y);
-    float l2 = mix(1.0, branchLayer(buv, 6.2, uDisp[2], 0.76, uBlur.z, uSeed + vec2(71.0, 43.0)), uLayerOn.z);
-    float l3 = mix(1.0, leafLayer(buv, 11.0, uDisp[3], uBlur.w, uSeed + vec2(13.0, 89.0)), uLayerOn.w);
+    // L-system branches (organic, grown CPU-side) + blobby foliage.
+    // trunk layer off by default now — the L-system carries its own trunks/limbs.
+    float l0 = mix(1.0, trunkLayer(uv, uDisp[0], 0.55, uBlur.x, uSeed, uFloor.x), uLayerOn.x);
+    float l1 = mix(1.0, branchLSystem(buv, uDisp[1]), uLayerOn.y);
+    float l2 = 1.0; // (removed: was a duplicate of the single L-system branch set)
+    // leaf cover ramps along the scene gradient: dense on the branch-origin side(s),
+    // sparse on the open side (uv-0.5 projected onto the gradient direction)
+    float leafCover = clamp(0.55 + dot(uLeafGrad, uv - 0.5) * uLeafFall, 0.12, 1.0);
+    float l3 = mix(1.0, leafLayer(buv, 11.0, uDisp[3], uBlur.w, uSeed + vec2(13.0, 89.0), leafCover), uLayerOn.w);
 
     float canopy = smoothstep(0.3, 0.7, fbm(buv * 0.4 + vec2(t * 0.01, 19.0) + uSeed + vec2(101.0, 57.0)));
-    float bias = (canopy - 0.5) * uCanopy + (1.0 - uv.y) * 0.10 - uv.x * 0.05;
+    // multiplicative so opaque wood stays opaque (additive bias was lifting the
+    // trunk into the dithered mid-tones); only modulates light that gets through
+    float modulate = 1.0 + (canopy - 0.5) * uCanopy + (1.0 - uv.y) * 0.10 - uv.x * 0.05;
 
-    float light = pow(l0 * l1 * l2 * l3, 0.6) * 1.3 + bias;
+    float light = pow(l0 * l1 * l2 * l3, 0.6) * 1.3 * modulate;
     light = clamp((light - 0.5) * uContrast + uCenter, 0.0, 1.0);
 
     // 2-tone ordered dither; gold only where tone is mid AND it's an actual
@@ -215,6 +274,14 @@ function initScene(container: HTMLElement) {
     uBlur: loc("uBlur"),
     uDither: loc("uDither"),
     uSeed: loc("uSeed"),
+    uParallax: loc("uParallax"),
+    uFloor: loc("uFloor"),
+    uSegTex: loc("uSegTex"),
+    uPosScale: loc("uPosScale"),
+    uWidScale: loc("uWidScale"),
+    uSegCount: loc("uSegCount"),
+    uLeafGrad: loc("uLeafGrad"),
+    uLeafFall: loc("uLeafFall"),
   }
   // randomize the noise field per page load
   gl.uniform2f(U.uSeed, Math.random() * 1000, Math.random() * 1000)
@@ -227,11 +294,158 @@ function initScene(container: HTMLElement) {
     goldHi: 0.7,
     canopy: 1.2,
     dither: 1,
-    layerOn: [1, 1, 1, 1],
-    blur: [0.0, 0.12, 0.35, 0.8], // trunk -> thick -> thin -> leaves
+    layerOn: [1, 1, 0, 1],
+    blur: [0.0, 0.12, 0.35, 0.45], // trunk -> thick -> thin -> leaves
+    floor: [0.1, 0.4, 0.7], // per-layer floor top range (trunk, thick, thin); floor = blur^2 * top
     sensitivity: 5,
     rest: 0.35,
     gustSpeed: 1,
+  }
+
+  // --- L-system branch generation (CPU side) --------------------------------
+  // We grow a stochastic, bracketed L-system with a turtle and emit tapered
+  // capsule segments (x0,y0,x1,y1,w0,w1) in buv space (x: 0..aspect, y: 0..1).
+  // Branches curve slightly along their length (springiness) and thin per level.
+  const MAXSEG = 1024
+  const TEXW = 4 // RGBA8 texels per segment: (x0,y0)(x1,y1)(w0,w1)(depth), each 16-bit
+  const WIDSCALE = 0.1 // width encode range
+  const texData = new Uint8Array(TEXW * MAXSEG * 4)
+  let segCount = 0
+  let posScale = 12 // decode scale for positions (aspect + 2), set in buildSegments
+  let leafGx = 0 // scene canopy gradient direction (uv space), set in buildSegments
+  let leafGy = 1
+  const segTex = gl.createTexture()!
+  gl.bindTexture(gl.TEXTURE_2D, segTex)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+  let treeSeed = Math.floor(Math.random() * 1e9)
+  // live-tunable L-system knobs (exposed in the debug panel). pipe model: every
+  // branch descends from a trunk, width is conserved at each split (so nothing
+  // floats), segment length scales with thickness, recursion stops near 1px.
+  const tree = {
+    sceneType: -1, // -1 = random per seed; 0..4 = top / top+left / top+right / bot+right / bot+left
+    leafBias: 1.4, // ramp strength of the canopy toward the origin side (0 = uniform)
+    nTrees: 6,
+    trunkWidth: 0.035, // root bough radius (everything derives from this)
+    lenRatio: 16, // segment length ~= lenRatio * current width (bigger = longer limbs)
+    maxLen: 0.4, // cap so thick boughs curve over several segments
+    curl: 0.3, // curl carried along a leader (springiness)
+    split3: 0.3, // P(3 children) at a split, else 2
+    leader: 0.618, // leader's share of the conserved cross-section AREA (1/phi)
+    golden: 1, // 0 = random sides, 1 = golden-angle phyllotaxis placement
+    conserve: 0.95, // total child area / parent area (<= 1; the taper)
+    endPx: 0.5, // stop when a limb is this many px thick (no floating stubs)
+  }
+  const mulberry32 = (a: number) => () => {
+    a |= 0
+    a = (a + 0x6d2b79f5) | 0
+    let t = Math.imul(a ^ (a >>> 15), 1 | a)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+  const buildSegments = () => {
+    const aspect = bw / Math.max(bh, 1)
+    const pxPerUnit = bh // 1 buv unit = bh px (isotropic, since buv.x is aspect-scaled)
+    const rng = mulberry32(treeSeed)
+    const segs: number[][] = []
+    const minW = tree.endPx / (2 * pxPerUnit) // radius at which a limb is ~endPx px thick
+    const GOLDEN = Math.PI * (3 - Math.sqrt(5)) // golden angle ~137.5deg (phyllotaxis)
+    const INVPHI = 2 / (1 + Math.sqrt(5)) // 1/phi ~0.618
+
+    // pipe model: grow a limb (length scales with width), then split, conserving
+    // CROSS-SECTION AREA (da Vinci) across 2-3 children. a phyllotaxis "phase"
+    // advances by the golden angle along each leader; side branches take their
+    // left/right placement from cos(phase) (the in-plane projection of where they
+    // sit around the stem) -> the golden-ratio spiral real trees use.
+    const grow = (x: number, y: number, ang: number, width: number, curl: number, phase: number, depth: number) => {
+      if (width < minW || segs.length >= MAXSEG) return
+      const len = Math.min(width * tree.lenRatio, tree.maxLen) * (0.85 + rng() * 0.3)
+      const a = ang + curl + (rng() - 0.5) * 0.05 // small jitter -> coherent direction
+      const ex = x + Math.cos(a) * len
+      const ey = y + Math.sin(a) * len
+      const wEnd = width * 0.97 // gentle taper within the segment
+      segs.push([x, y, ex, ey, width, wEnd, depth])
+      const n = rng() < tree.split3 ? 3 : 2
+      const totalA = wEnd * wEnd * tree.conserve
+      // leader keeps 1/phi of the area (the golden-ratio split real branches show)
+      const leaderA = totalA * (tree.leader * (0.92 + rng() * 0.16))
+      const wLeader = Math.sqrt(Math.min(totalA, leaderA))
+      grow(ex, ey, a, wLeader, curl, phase + GOLDEN, depth) // phase spirals by golden angle
+      let remA = Math.max(0, totalA - wLeader * wLeader)
+      for (let k = 0; k < n - 1; k++) {
+        const ac = k === n - 2 ? remA : remA * (0.45 + rng() * 0.25)
+        remA -= ac
+        const wc = Math.sqrt(ac)
+        if (wc < minW) continue
+        const ph = phase + (k + 1) * GOLDEN
+        // golden phyllotaxis (cos of the spiral phase) blended with randomness
+        const lat = tree.golden * Math.cos(ph) + (1 - tree.golden) * (rng() - 0.5) * 2
+        const side = lat >= 0 ? 1 : -1
+        const thin = 1 - Math.min(1, wc / Math.max(wEnd, 1e-6))
+        const sa = a + side * (0.35 + thin * 0.55) + (rng() - 0.5) * 0.15
+        grow(ex, ey, sa, wc, (rng() - 0.5) * tree.curl, ph, depth)
+      }
+    }
+    // 5 scene archetypes for cohesion: all trees in a scene enter from the same
+    // edge set. edge codes: 0 left, 1 right, 2 top, 3 bottom. gx/gy is the canopy
+    // gradient direction in uv space (where leaf cover is densest -> the origin sides).
+    const SCENES = [
+      { edges: [2], fx: 0.33, top: true, gx: 0, gy: 1 }, // top (anchored at a thirds line)
+      { edges: [2, 0], fx: 0.33, top: true, gx: -0.7, gy: 0.7 }, // top + left
+      { edges: [2, 1], fx: 0.67, top: true, gx: 0.7, gy: 0.7 }, // top + right
+      { edges: [3, 1], fx: 0.67, top: false, gx: 0.7, gy: -0.7 }, // bottom + right
+      { edges: [3, 0], fx: 0.33, top: false, gx: -0.7, gy: -0.7 }, // bottom + left
+    ]
+    const sceneIdx = tree.sceneType >= 0 ? Math.min(4, Math.round(tree.sceneType)) : Math.floor(rng() * SCENES.length)
+    const scene = SCENES[sceneIdx]
+    leafGx = scene.gx // canopy gradient: leaves densest toward the branch origin sides
+    leafGy = scene.gy
+    const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v))
+    // dominant bough (depth ~0) anchors tightly at the thirds focus; farther boughs
+    // (higher depth) spread more. roots stay on the origin side -> negative space.
+    const rootForEdge = (edge: number, depth: number): [number, number, number] => {
+      const spread = 0.1 + depth * 0.45 // tight for the near dominant, looser for far
+      const fx = clamp(scene.fx + (rng() - 0.5) * spread, 0.04, 0.96)
+      if (edge === 2) return [fx * aspect, 1.05, -Math.PI / 2 + (rng() - 0.5) * 0.6]
+      if (edge === 3) return [fx * aspect, -0.05, Math.PI / 2 + (rng() - 0.5) * 0.6]
+      const yc = scene.top ? 0.7 : 0.3 // anchor height on the origin side
+      const y = clamp(yc + (rng() - 0.5) * spread, 0.05, 0.95)
+      if (edge === 0) return [-0.05, y, (rng() - 0.5) * 0.6]
+      return [aspect + 0.05, y, Math.PI + (rng() - 0.5) * 0.6]
+    }
+    const nTrees = Math.max(1, Math.round(tree.nTrees))
+    for (let i = 0; i < nTrees; i++) {
+      if (segs.length >= MAXSEG) break
+      const edge = scene.edges[i % scene.edges.length] // cover each origin edge
+      const depth = nTrees > 1 ? i / (nTrees - 1) : 0 // 0 = near dominant, 1 = far
+      const [x, y, ang] = rootForEdge(edge, depth)
+      // near boughs thick & dominant; far boughs thinner (and rendered fainter/softer)
+      const w = tree.trunkWidth * (1 - depth * 0.5) * (0.9 + rng() * 0.2)
+      grow(x, y, ang, w, (rng() - 0.5) * tree.curl, rng() * Math.PI * 2, depth)
+    }
+    segCount = Math.min(segs.length, MAXSEG)
+    posScale = aspect + 2
+    const enc = (v: number, off: number) => {
+      const val = Math.max(0, Math.min(65535, Math.round(v * 65535)))
+      texData[off] = (val >> 8) & 255
+      texData[off + 1] = val & 255
+    }
+    texData.fill(0)
+    for (let i = 0; i < segCount; i++) {
+      const s = segs[i]
+      const base = i * TEXW * 4
+      enc((s[0] + 1) / posScale, base) // x0 -> texel0.rg
+      enc((s[1] + 1) / posScale, base + 2) // y0 -> texel0.ba
+      enc((s[2] + 1) / posScale, base + 4) // x1 -> texel1.rg
+      enc((s[3] + 1) / posScale, base + 6) // y1 -> texel1.ba
+      enc(s[4] / WIDSCALE, base + 8) // w0 -> texel2.rg
+      enc(s[5] / WIDSCALE, base + 10) // w1 -> texel2.ba
+      enc(s[6], base + 12) // depth (0..1) -> texel3.rg
+    }
+    gl.bindTexture(gl.TEXTURE_2D, segTex)
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, TEXW, MAXSEG, 0, gl.RGBA, gl.UNSIGNED_BYTE, texData)
   }
 
   let colA = cssVar("--komorebi-light")
@@ -239,7 +453,7 @@ function initScene(container: HTMLElement) {
   let colB = cssVar("--komorebi-shadow")
   let chartRGB = rgbStr("--secondary")
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  const SCALE = 3
+  const SCALE = 2
 
   let w = 600
   let h = 180
@@ -254,6 +468,7 @@ function initScene(container: HTMLElement) {
     canvas.style.width = w + "px"
     canvas.style.height = h + "px"
     gl.viewport(0, 0, bw, bh)
+    buildSegments() // segment positions are in buv space, which depends on aspect
   }
   resize()
   const ro = new ResizeObserver(() => {
@@ -273,8 +488,11 @@ function initScene(container: HTMLElement) {
   document.addEventListener("themechange", syncColors)
 
   // --- wind: cursor speed raises a ceiling under a slow gust envelope --------
+  // --- parallax: mouse x (desktop) / device tilt (mobile), -1..1 -------------
   let ceiling = u.rest
   let ceilingTarget = u.rest
+  let parallax = 0
+  let parallaxTarget = 0
   let lastX = 0
   let lastY = 0
   let lastT = 0
@@ -290,13 +508,19 @@ function initScene(container: HTMLElement) {
     lastX = e.clientX
     lastY = e.clientY
     lastT = now
+    parallaxTarget = (e.clientX / window.innerWidth - 0.5) * 2
   }
   window.addEventListener("pointermove", onMove, { passive: true })
+  // device tilt -> parallax (gamma = left/right tilt, ~±35deg full range)
+  const onTilt = (e: DeviceOrientationEvent) => {
+    if (e.gamma != null) parallaxTarget = Math.max(-1, Math.min(1, e.gamma / 35))
+  }
+  window.addEventListener("deviceorientation", onTilt)
 
   const gust = (t: number) =>
     0.7 + 0.3 * (0.65 * Math.sin(t * 0.27 * u.gustSpeed) + 0.35 * Math.sin(t * 0.13 * u.gustSpeed + 2.0))
   const DIR = [0.97, 0.22]
-  const LNAME = ["trunk", "thick", "thin", "leaves"]
+  const LNAME = ["trunk", "branches", "(unused)", "leaves"]
   const BEND = [0.0, 0.05, 0.1, 0.36] // trunk static; leaves bend the most
   const FLUT = [0.0, 0.03, 0.08, 0.42] // leaves flutter the most
   const FREQ = [0.0, 0.7, 1.5, 3.2]
@@ -385,6 +609,19 @@ function initScene(container: HTMLElement) {
     row.append(cb, span)
     panel.appendChild(row)
   }
+  const addButton = (label: string, onClick: () => void) => {
+    const b = document.createElement("button")
+    b.className = "dappled-debug-btn"
+    b.textContent = label
+    b.addEventListener("click", onClick)
+    panel.appendChild(b)
+  }
+  // rebuild the L-system geometry after a knob changes (loop re-uploads each frame;
+  // for reduced-motion there is no loop, so draw once)
+  const regen = () => {
+    buildSegments()
+    if (reduce) draw()
+  }
 
   addHeader("wind")
   addSlider("cursor sensitivity", 1, 15, 0.5, () => u.sensitivity, (v) => (u.sensitivity = v))
@@ -394,12 +631,29 @@ function initScene(container: HTMLElement) {
   addHeader("branches")
   for (let i = 0; i < 4; i++) {
     const k = i
+    if (k === 2) continue // layer 2 is no longer used (single L-system branch set)
     addToggle(LNAME[k], () => u.layerOn[k] > 0.5, (on) => (u.layerOn[k] = on ? 1 : 0))
     addSlider(`${LNAME[k]} blur`, 0, 1, 0.02, () => u.blur[k], (v) => (u.blur[k] = v))
+    if (k < 3) addSlider(`${LNAME[k]} floor max`, 0, 1, 0.02, () => u.floor[k], (v) => (u.floor[k] = v))
     addSlider(`${LNAME[k]} bend`, 0, 0.5, 0.005, () => BEND[k], (v) => (BEND[k] = v))
     addSlider(`${LNAME[k]} flutter`, 0, 0.5, 0.005, () => FLUT[k], (v) => (FLUT[k] = v))
     addSlider(`${LNAME[k]} flutter spd`, 0, 5, 0.1, () => FREQ[k], (v) => (FREQ[k] = v))
   }
+
+  addHeader("tree (L-system)")
+  addButton("reshuffle tree", () => { treeSeed = Math.floor(Math.random() * 1e9); regen() })
+  addSlider("scene (-1=rand)", -1, 4, 1, () => tree.sceneType, (v) => { tree.sceneType = v; regen() })
+  addSlider("leaf bias", 0, 3, 0.05, () => tree.leafBias, (v) => { tree.leafBias = v })
+  addSlider("trees", 1, 12, 1, () => tree.nTrees, (v) => { tree.nTrees = v; regen() })
+  addSlider("trunk width", 0.02, 0.09, 0.002, () => tree.trunkWidth, (v) => { tree.trunkWidth = v; regen() })
+  addSlider("len / width", 4, 28, 0.5, () => tree.lenRatio, (v) => { tree.lenRatio = v; regen() })
+  addSlider("max seg len", 0.06, 0.7, 0.01, () => tree.maxLen, (v) => { tree.maxLen = v; regen() })
+  addSlider("curl", 0, 0.8, 0.02, () => tree.curl, (v) => { tree.curl = v; regen() })
+  addSlider("P(3 split)", 0, 1, 0.05, () => tree.split3, (v) => { tree.split3 = v; regen() })
+  addSlider("leader share", 0.4, 0.95, 0.02, () => tree.leader, (v) => { tree.leader = v; regen() })
+  addSlider("golden phyllotaxis", 0, 1, 0.05, () => tree.golden, (v) => { tree.golden = v; regen() })
+  addSlider("width conserve", 0.7, 1, 0.01, () => tree.conserve, (v) => { tree.conserve = v; regen() })
+  addSlider("end thickness px", 0.5, 3, 0.1, () => tree.endPx, (v) => { tree.endPx = v; regen() })
 
   addHeader("tone & dither")
   addToggle("dither", () => u.dither > 0.5, (on) => (u.dither = on ? 1 : 0))
@@ -440,6 +694,16 @@ function initScene(container: HTMLElement) {
     gl.uniform4f(U.uLayerOn, u.layerOn[0], u.layerOn[1], u.layerOn[2], u.layerOn[3])
     gl.uniform4f(U.uBlur, u.blur[0], u.blur[1], u.blur[2], u.blur[3])
     gl.uniform1f(U.uDither, u.dither)
+    gl.uniform1f(U.uParallax, parallax)
+    gl.uniform3f(U.uFloor, u.floor[0], u.floor[1], u.floor[2])
+    gl.activeTexture(gl.TEXTURE0)
+    gl.bindTexture(gl.TEXTURE_2D, segTex)
+    gl.uniform1i(U.uSegTex, 0)
+    gl.uniform1f(U.uPosScale, posScale)
+    gl.uniform1f(U.uWidScale, WIDSCALE)
+    gl.uniform1i(U.uSegCount, segCount)
+    gl.uniform2f(U.uLeafGrad, leafGx, leafGy)
+    gl.uniform1f(U.uLeafFall, tree.leafBias)
     gl.drawArrays(gl.TRIANGLES, 0, 3)
   }
 
@@ -453,6 +717,7 @@ function initScene(container: HTMLElement) {
     tReal += dt
     ceilingTarget = Math.max(u.rest, ceilingTarget * 0.97)
     ceiling += (ceilingTarget - ceiling) * (ceilingTarget > ceiling ? 0.02 : 0.05)
+    parallax += (parallaxTarget - parallax) * 0.08
     wind = gust(tReal) * ceiling
     // cumulative displacement down the tree
     let s = 0
@@ -492,10 +757,12 @@ function initScene(container: HTMLElement) {
     cancelAnimationFrame(raf)
     ro.disconnect()
     window.removeEventListener("pointermove", onMove)
+    window.removeEventListener("deviceorientation", onTilt)
     document.removeEventListener("themechange", syncColors)
     document.removeEventListener("visibilitychange", onVis)
     document.removeEventListener("keydown", onKey)
     panel.remove()
+    gl.deleteTexture(segTex)
     gl.getExtension("WEBGL_lose_context")?.loseContext()
     canvas.remove()
   })

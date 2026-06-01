@@ -453,6 +453,25 @@ body.animation-ready #quartz-body {
     }
   }
 
+  .dappled-debug-btn {
+    display: block;
+    width: 100%;
+    margin: 0.3rem 0;
+    padding: 4px 6px;
+    background: var(--lightgray);
+    color: var(--dark);
+    border: 1px solid var(--dark);
+    border-radius: 0;
+    font: inherit;
+    font-size: 0.7rem;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--secondary);
+      color: var(--light);
+    }
+  }
+
   label {
     display: block;
     margin: 0.4rem 0;
