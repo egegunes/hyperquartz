@@ -32,6 +32,10 @@ const FRAG = `#extension GL_OES_standard_derivatives : enable
   uniform int uSegCount;     // number of live segments
   uniform vec2 uLeafGrad;    // canopy gradient dir in uv space (toward the origin sides)
   uniform float uLeafFall;   // ramp strength of leaf cover along the gradient
+  uniform float uLeafFollow; // 0 = uniform leaf depth, 1 = leaf depth tracks branches
+  uniform float uTrunkCount; // 0, 1, or 2 decorative trunks
+  uniform vec2 uTrunkX;      // their x positions (uv space)
+  uniform float uTrunkW;     // trunk half-width (uv space), seeded thin
   uniform float uTime;       // real seconds (slow canopy drift)
   uniform vec2 uDisp[4];     // per-layer cumulative sway displacement
   uniform vec2 uResolution;
@@ -75,11 +79,13 @@ const FRAG = `#extension GL_OES_standard_derivatives : enable
   // shadow from the L-system branch segments (grown CPU-side, packed into a texture;
   // segments are tapered capsules in buv space, x: 0..aspect, y: 0..1). we also grab
   // the local limb radius at the nearest point so thin limbs dither.
-  float branchLSystem(vec2 buv, vec2 disp){
+  // returns (signed distance to nearest limb surface, that limb's depth). shared
+  // by the branch shadow and the leaf layer so we only walk the segments once.
+  vec2 branchField(vec2 buv){
     buv.x += uParallax * 0.04;
-    buv += disp * 0.5; // wind sway
-    float d = 1e9; // signed distance to the nearest limb surface (negative = inside)
-    float nearDepth = 0.0; // depth (0 near .. 1 far) of the closest limb
+    buv += uDisp[1] * 0.5; // wind sway
+    float d = 1e9;
+    float nearDepth = 0.0;
     float rowScale = 1.0 / float(MAXSEG);
     for (int i = 0; i < MAXSEG; i++){
       if (i >= uSegCount) break;
@@ -98,10 +104,13 @@ const FRAG = `#extension GL_OES_standard_derivatives : enable
         nearDepth = dec16(texture2D(uSegTex, vec2(3.5 / 4.0, row)).rg);
       }
     }
-    // penumbra: the shadow darkens across a band whose half-width grows with the
-    // caster's distance (depth). a thick limb is wider than the band, so its core
-    // reaches full umbra while the edges lighten; a thin twig is narrower than the
-    // band, so its penumbras overlap and it never fully darkens (dithers on its own).
+    return vec2(d, nearDepth);
+  }
+  // penumbra: the shadow darkens across a band whose half-width grows with the
+  // caster's distance (depth). a thick limb is wider than the band, so its core
+  // reaches full umbra while the edges lighten; a thin twig is narrower than the
+  // band, so its penumbras overlap and it never fully darkens (dithers on its own).
+  float branchShadow(float d, float nearDepth){
     float pen = 0.006 + nearDepth * 0.06;
     float shadow = 1.0 - smoothstep(-pen, pen, d); // 1 deep inside -> 0 outside
     float umbra = mix(0.03, 0.34, nearDepth); // far limbs' deepest shadow is fainter
@@ -131,16 +140,16 @@ const FRAG = `#extension GL_OES_standard_derivatives : enable
     float floorT = b * b * topRange; // shadow fades with distance^2 toward topRange
     return mix(1.0, floorT, s);
   }
-  // trunk: 1-2 near-vertical, mostly-straight thick lines at seeded x-positions
-  // (explicit fixed-width bands, so they can't blow up into a slab). uv-space.
-  float trunkLayer(vec2 uv, vec2 disp, float thick, float b, vec2 seed, float topRange){
-    float lean = (noise(vec2(seed.y, uv.y * 0.6)) - 0.5) * 0.06; // gentle lean, mostly straight
-    float x = uv.x + lean + uParallax * 0.015; // slight parallax (trunk is the anchor)
-    float halfw = 0.015 + (1.0 - thick) * 0.05;                  // line width (thick -> thinner)
-    float c0 = fract(sin(seed.x * 0.017 + 1.3) * 43758.5453);    // line positions
-    float c1 = fract(sin(seed.y * 0.023 + 4.7) * 43758.5453);
-    float use2 = step(0.4, fract(sin(seed.x * 0.041) * 9871.0)); // ~60% chance of a 2nd line
-    float d = min(abs(x - c0), mix(10.0, abs(x - c1), use2));    // distance to nearest line
+  // decorative thick trunk(s): 0-2 near-vertical solid bands. count and x-positions
+  // are decided CPU-side (uTrunkCount, uTrunkX) so they're rare and sit near the
+  // scene's focus column. fixed-width, so they can't blow up into a slab. uv-space.
+  float trunkLayer(vec2 uv, float thick, float b, float topRange){
+    if (uTrunkCount < 0.5) return 1.0; // no trunk this scene
+    float lean = (noise(vec2(uTrunkX.x * 41.0, uv.y * 0.6)) - 0.5) * 0.06; // gentle wobble
+    float x = uv.x + lean + uParallax * 0.015;
+    float halfw = uTrunkW; // seeded width (CPU-side, biased thin)
+    float d = abs(x - uTrunkX.x);
+    if (uTrunkCount > 1.5) d = min(d, abs(x - uTrunkX.y));
     float s = 1.0 - smoothstep(halfw, halfw + 0.02 + b * 0.1, d);
     float floorT = b * b * topRange;
     return mix(1.0, floorT, s);
@@ -163,15 +172,19 @@ const FRAG = `#extension GL_OES_standard_derivatives : enable
     vec2 buv = vec2(uv.x * aspect, uv.y);
     float t = uTime;
 
-    // L-system branches (organic, grown CPU-side) + blobby foliage.
-    // trunk layer off by default now — the L-system carries its own trunks/limbs.
-    float l0 = mix(1.0, trunkLayer(uv, uDisp[0], 0.55, uBlur.x, uSeed, uFloor.x), uLayerOn.x);
-    float l1 = mix(1.0, branchLSystem(buv, uDisp[1]), uLayerOn.y);
-    float l2 = 1.0; // (removed: was a duplicate of the single L-system branch set)
+    // walk the L-system segments once; reuse the field for branches AND leaves
+    vec2 bf = branchField(buv); // (signed dist, depth) of the nearest limb
+    // rare decorative thick trunk(s), count/positions decided CPU-side
+    float l0 = mix(1.0, trunkLayer(uv, 0.45, uBlur.x, uFloor.x), uLayerOn.x);
+    float l1 = mix(1.0, branchShadow(bf.x, bf.y), uLayerOn.y);
+    float l2 = 1.0;
     // leaf cover ramps along the scene gradient: dense on the branch-origin side(s),
     // sparse on the open side (uv-0.5 projected onto the gradient direction)
     float leafCover = clamp(0.55 + dot(uLeafGrad, uv - 0.5) * uLeafFall, 0.12, 1.0);
-    float l3 = mix(1.0, leafLayer(buv, 11.0, uDisp[3], uBlur.w, uSeed + vec2(13.0, 89.0), leafCover), uLayerOn.w);
+    // leaf depth follows the nearby branch (sitting just beyond the twigs) so foliage
+    // softens/fades with the limbs it hangs from instead of being one flat plane
+    float leafDepth = mix(uBlur.w, clamp(bf.y + 0.2, 0.0, 1.0), uLeafFollow);
+    float l3 = mix(1.0, leafLayer(buv, 11.0, uDisp[3], leafDepth, uSeed + vec2(13.0, 89.0), leafCover), uLayerOn.w);
 
     float canopy = smoothstep(0.3, 0.7, fbm(buv * 0.4 + vec2(t * 0.01, 19.0) + uSeed + vec2(101.0, 57.0)));
     // multiplicative so opaque wood stays opaque (additive bias was lifting the
@@ -280,6 +293,10 @@ function initScene(container: HTMLElement) {
     uSegCount: loc("uSegCount"),
     uLeafGrad: loc("uLeafGrad"),
     uLeafFall: loc("uLeafFall"),
+    uLeafFollow: loc("uLeafFollow"),
+    uTrunkCount: loc("uTrunkCount"),
+    uTrunkX: loc("uTrunkX"),
+    uTrunkW: loc("uTrunkW"),
   }
   // randomize the noise field per page load
   gl.uniform2f(U.uSeed, Math.random() * 1000, Math.random() * 1000)
@@ -312,6 +329,10 @@ function initScene(container: HTMLElement) {
   let posScale = 12 // decode scale for positions (aspect + 2), set in buildSegments
   let leafGx = 0 // scene canopy gradient direction (uv space), set in buildSegments
   let leafGy = 1
+  let trunkCount = 0 // 0-2 decorative trunks, set in buildSegments
+  let trunkX0 = 0.5
+  let trunkX1 = 0.5
+  let trunkW = 0.018 // trunk half-width (uv), seeded thin in buildSegments
   const segTex = gl.createTexture()!
   gl.bindTexture(gl.TEXTURE_2D, segTex)
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
@@ -324,7 +345,9 @@ function initScene(container: HTMLElement) {
   // floats), segment length scales with thickness, recursion stops near 1px.
   const tree = {
     sceneType: -1, // -1 = random per seed; 0..4 = top / top+left / top+right / bot+right / bot+left
+    trunkCount: -1, // -1 = random (avg ~0.8, rare); 0..2 forces the decorative trunk count
     leafBias: 1.4, // ramp strength of the canopy toward the origin side (0 = uniform)
+    leafFollow: 0.6, // how strongly leaf depth tracks the nearby branch depth
     rootOffset: 0.9, // how far roots sit off-canvas (bigger = canopy fills the edge)
     nTrees: 6,
     trunkWidth: 0.035, // root bough radius (everything derives from this)
@@ -352,6 +375,7 @@ function initScene(container: HTMLElement) {
     const rng = mulberry32(treeSeed)
     const segs: number[][] = []
     const minW = tree.endPx / (2 * pxPerUnit) // radius at which a limb is ~endPx px thick
+    const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v))
     const GOLDEN = Math.PI * (3 - Math.sqrt(5)) // golden angle ~137.5deg (phyllotaxis)
     const INVPHI = 2 / (1 + Math.sqrt(5)) // 1/phi ~0.618
     // depth random-walk: the tree is a 3D volume. the trunk holds a central depth;
@@ -413,7 +437,12 @@ function initScene(container: HTMLElement) {
     const scene = SCENES[sceneIdx]
     leafGx = scene.gx // canopy gradient: leaves densest toward the branch origin sides
     leafGy = scene.gy
-    const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v))
+    // rare decorative trunks (0-2), placed near the scene's focus column
+    const tr = rng()
+    trunkCount = tree.trunkCount >= 0 ? Math.round(tree.trunkCount) : tr < 0.4 ? 0 : tr < 0.8 ? 1 : 2
+    trunkX0 = clamp(scene.fx + (rng() - 0.5) * 0.25, 0.05, 0.95)
+    trunkX1 = clamp(scene.fx + (rng() - 0.5) * 0.5, 0.05, 0.95)
+    trunkW = 0.008 + rng() * rng() * 0.03 // mostly slender, occasionally a fat trunk
     // dominant bough (depth ~0) anchors tightly at the thirds focus; farther boughs
     // (higher depth) spread more. roots stay on the origin side -> negative space.
     const off = tree.rootOffset // push roots off-canvas so the bare trunk section is
@@ -433,9 +462,10 @@ function initScene(container: HTMLElement) {
       if (segs.length >= MAXSEG) break
       const edge = scene.edges[i % scene.edges.length] // cover each origin edge
       const role = nTrees > 1 ? i / (nTrees - 1) : 0 // 0 = dominant, 1 = minor
-      // dominant tree is thick & sits nearer the wall; minor trees thinner & farther.
+      // dominant trunk sits near the wall so it renders solid; minor trees farther.
+      // small per-seed jitter so the trunk's depth varies between reshuffles.
       // (this is the central depth of each trunk; branches drift around it.)
-      const base = 0.3 + role * 0.3
+      const base = clamp(0.12 + role * 0.4 + (rng() - 0.5) * 0.1, 0.04, 0.95)
       const [x, y, ang] = rootForEdge(edge, role)
       const w = tree.trunkWidth * (1 - role * 0.5) * (0.9 + rng() * 0.2)
       grow(x, y, ang, w, (rng() - 0.5) * tree.curl, rng() * Math.PI * 2, base)
@@ -659,7 +689,9 @@ function initScene(container: HTMLElement) {
   addButton("reshuffle tree", () => { treeSeed = Math.floor(Math.random() * 1e9); regen() })
   addSlider("scene (-1=rand)", -1, 4, 1, () => tree.sceneType, (v) => { tree.sceneType = v; regen() })
   addSlider("root offset", 0, 1.6, 0.02, () => tree.rootOffset, (v) => { tree.rootOffset = v; regen() })
+  addSlider("trunks (-1=rand)", -1, 2, 1, () => tree.trunkCount, (v) => { tree.trunkCount = v; regen() })
   addSlider("leaf bias", 0, 3, 0.05, () => tree.leafBias, (v) => { tree.leafBias = v })
+  addSlider("leaf follows depth", 0, 1, 0.05, () => tree.leafFollow, (v) => { tree.leafFollow = v })
   addSlider("trees", 1, 12, 1, () => tree.nTrees, (v) => { tree.nTrees = v; regen() })
   addSlider("trunk width", 0.02, 0.09, 0.002, () => tree.trunkWidth, (v) => { tree.trunkWidth = v; regen() })
   addSlider("len / width", 4, 28, 0.5, () => tree.lenRatio, (v) => { tree.lenRatio = v; regen() })
@@ -722,6 +754,10 @@ function initScene(container: HTMLElement) {
     gl.uniform1i(U.uSegCount, segCount)
     gl.uniform2f(U.uLeafGrad, leafGx, leafGy)
     gl.uniform1f(U.uLeafFall, tree.leafBias)
+    gl.uniform1f(U.uLeafFollow, tree.leafFollow)
+    gl.uniform1f(U.uTrunkCount, trunkCount)
+    gl.uniform2f(U.uTrunkX, trunkX0, trunkX1)
+    gl.uniform1f(U.uTrunkW, trunkW)
     gl.drawArrays(gl.TRIANGLES, 0, 3)
   }
 
