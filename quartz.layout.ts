@@ -4,10 +4,13 @@ import { SimpleSlug } from "./quartz/util/path"
 
 const recentNotes = [
   Component.RecentNotes({
-    title: "Recent Writing",
+    title: "Selected Writing",
     limit: 4,
     filter: (f) =>
-      f.slug!.startsWith("posts/") && f.slug! !== "posts/index" && !f.frontmatter?.noindex,
+      f.slug!.startsWith("posts/") &&
+      f.slug! !== "posts/index" &&
+      !f.frontmatter?.noindex &&
+      !(f.frontmatter?.tags ?? []).includes("personal"),
     linkToMore: "posts/" as SimpleSlug,
   }),
   Component.RecentNotes({
