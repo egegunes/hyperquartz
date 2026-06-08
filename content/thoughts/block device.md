@@ -1,6 +1,6 @@
 ---
-title: "block device"
-date: "2026-01-18"
+title: Block device
+date: 2026-01-18
 tags:
   - seed
 ---

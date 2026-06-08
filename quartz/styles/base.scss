@@ -492,6 +492,38 @@ pre {
       width: 3rem;
     }
   }
+
+  // plaintext blocks: no border, no line numbers, tighter line-height so ascii art / boxes render properly
+  &[data-language="plaintext"] {
+    line-height: 1;
+    border: none;
+    border-radius: 0;
+    // margin (not padding): the `figure > pre { padding: 0 }` rule above out-specifies pre padding
+    margin: 2rem 1rem;
+    // system mono fonts whose box-drawing glyphs tile seamlessly (JetBrains/Fira/Plex leave gaps)
+    font-family: "Menlo", "DejaVu Sans Mono", "Consolas", "Liberation Mono", monospace;
+
+    & > code {
+      line-height: 1;
+      font-family: inherit;
+      padding: 0;
+      border-radius: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+
+      & > [data-line] {
+        padding: 0;
+        border-left: none;
+
+        &::before {
+          content: none;
+          counter-increment: none;
+          width: 0;
+          margin-right: 0;
+        }
+      }
+    }
+  }
 }
 
 code {

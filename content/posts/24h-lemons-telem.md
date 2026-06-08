@@ -1,76 +1,302 @@
 ---
-title: Building a live telemetry system for a $800 race car
+title: Building race telemetry for a '92 Honda Accord
 date: 2026-03-23
 tags:
-  - seed
-draft: true
+  - fruit
+  - technical
+draft: false
 ---
-I race a manual 1992 Honda Accord in [24 Hours of Lemons](https://24hoursoflemons.com/) with our team Magicarp Motors. We all built and raced the car together, but the telemetry system was built over the course of about a week in late March. Shihao and I both took time off work to build it from scratch before our Sonoma race. He designed the hardware architecture and wrote the embedded software; I built the software stack and data flows.
+I [[posts/driving|drive]] a manual 1992 Honda Accord in [24 Hours of Lemons](https://24hoursoflemons.com/) as a part of our team [Magicarp Motors](https://www.magicarpmotors.com/).
 
-## Why we built our own
+A big part of the fun was to make our spectator experience as good as, if not better than, the F1 viewing experience. We wanted people to be able to come to the race, really feel immersed in the intensity of it. We wanted people to see the intense passes, the g-forces on each turn and braking zone, and hear the engine hum and tires squeal.
 
-The main commercial options (RaceChrono, Harry's Lap Timer) get you phone GPS (which is normally only accurate to ~10m) and maybe an OBD-II connection, but we wanted real sensors: actual throttle position off the ECU, manifold pressure, coolant temp, brake pressure, tach signal, vehicle speed signal. We wanted live video with telemetry overlays compositable in OBS, proper pace deltas, and telemetry review for analyzing post-race. So we built the whole thing.
+<video class="lazy" data-src="/thoughts/images/telem_clip.webm" autoplay loop muted></video>
 
-This post walks through the software side: what it does, how each part works, and the decisions we made along the way.
+<video class="lazy" data-src="/thoughts/images/telem_review_clip.webm" autoplay loop muted></video>
 
-## Hardware
+Part of that was making sure we could get live and accurate video and telemetry streams overlayed in a way so that people from the paddock and those at home could watch. 
 
-Shihao covers the hardware in detail in [his post](https://www.shihaocao.com/builds/telemetry).
+---
 
-The short version: the Accord is pre-OBD2, so most telemetry points come from analog sense taps off the ECU harness — voltage dividers for 12V signals, direct connections for 5V.
+Though the car itself is something we worked on over the course of many months, this telemetry and live streaming setup was built by Shihao[^1] and I over the course of about a week in late March before our Sonoma race.
 
-An Arduino Mega 2560 reads five analog sensors (coolant temp, throttle position, MAP, brake pressure, battery voltage) plus interrupt-driven RPM and VSS at 25Hz. A RaceBox Micro handles GPS and IMU over BLE at the same rate.
+[^1]: Shihao talks more about the [hardware side of the telemetry stack on his blog](https://www.shihaocao.com/builds/telemetry).
 
-Everything feeds into an NVIDIA Jetson Nano that runs the telemetry server, bridge processes, and GStreamer video streaming — two USB webcams (H.264 encoded on the Jetson's GPU, streamed via SRT) and a Rode LavMicro-U mic. The whole system runs off the kill switch's +12V downstream.
+## Reading values
 
-## Firmware: frequency measurement
+The main commercial options (RaceChrono, Harry's Lap Timer) get you phone GPS (which is normally only accurate to ~10m) and maybe an OBD-II connection which lets you tap values from the ECU directly. Unfortunately for us, the Honda Accord was made in 1992 which predates the OBD-II protocol that most modern telemetry and diagnostics tools.
 
-Shihao wrote the embedded firmware on the Mega; I wrote the serial bridge that reads its output on the Jetson side. The firmware uses a ring buffer of 16 timestamps for RPM and VSS frequency measurement. The reason is a little subtle, and it matters enough that I'll walk through it.
+Shihao then had the brilliant idea of just *manually tapping wires* for values we cared about.
+
+[His post](https://www.shihaocao.com/builds/telemetry#details-of-tapping) goes into more details about this process but the tldr; is that there were 3 main classes of signals from the car we cared about:
+
+- 12V analog (brake indicator, battery voltage)
+- 5V analog (throttle position, engine coolant temp, manifold absolute pressure)
+- 12V square wave (RPM, vehicle speed sensor)
+
+The analog values were read via an onboard Arduino. We also wanted GPS, accelerometer, and gyroscope readings which the ECU did not provide so we bought a [Racebox Micro](https://www.racebox.pro/products/racebox-micro) for those.
+
+![[thoughts/images/lemons-telem-setup.png|400]]
+
+All of this was fed into an onboard Jetson Nano that we used to run a custom built telemetry server which ingested both the Arduino and Racebox data feeds.
+
+### Frequency measurement
+
+One really neat thing that I didn't think about until we started doing live driveway tests was how to interpolate rapidly changing values.
+
+The Arduino firmware originally uses a 16-slot ring-buffer of `micros()` timestamp of when the last pulses happened.
+
+```plaintext
+Square wave reading
+    ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐ ┌─┐         ...
+  ──┘ └─┘ └─┘ └─┘ └─┘ └─┘ └─────────────  time →
+    ↑   ↑   ↑   ↑   ↑   ↑
+    recordPulse() → micros() stamped each rising edge
+
+Ring-buffer
+					   head ─┐ (next write)
+ idx:  0    1    2    3   …  │ … 15
+	  ┌────┬────┬────┬────┬─▼──┬────┐
+	  │ t₀ │ t₁ │ t₂ │ t₃ │ .. │ t₁₅│   (timestamps in µs)
+	  └────┴────┴────┴────┴────┴────┘
+		↑oldest          newest↑
+```
+
+However, the problem was that this approach would _overestimate_ in rapid deceleration (important for correctly reporting RPMs in intense braking conditions!).
 
 Say the engine is at 5000 RPM and drops to 1000 RPM. The last five pulses in the ring buffer came in at 100, 102, 104, 106, and 108ms. It's now 150ms and no new pulses have arrived.
 
-The naive approach — what I'm calling **pulse-only frequency** — looks at the oldest and newest pulse in the buffer: 5 pulses over 8ms = 625 Hz. This reflects what the engine _was_ doing, not what it's doing now. During deceleration it massively overestimates because all those pulses arrived when RPM was still high, and the 42ms silence since the last pulse is invisible.
+The naive approach — what I'm calling **pulse-only frequency** — looks at the oldest and newest pulse in the buffer: 5 pulses over 8ms = 625 Hz. This reflects what the engine _was_ doing, not what it's doing now. During deceleration it massively overestimates because all those pulses arrived when RPM was still high, and the 42ms gap since the last pulse is invisible.
+
+```plaintext
+Hz
+100 ┤█  █  █  ░
+    │█  █  █  ░  ░
+ 80 ┤█  █  █  █  ░  ░
+    │█  █  █  █  █  ░  ░
+ 60 ┤█  █  █  █  █  █  ░  ░
+    │█  █  █  █  █  █  ░  ░  ░
+ 40 ┤█  █  █  █  █  █  █  ░  ░  ░
+    │█  █  █  █  █  █  █  █  ░  ░
+ 20 ┤█  █  █  █  █  █  █  █  █  █
+    │█  █  █  █  █  █  █  █  █  █
+  0 ┼──────────────────────────────► t
+     └ steady ┘ ↑ deceleration begins
+
+█ true frequency      ░ overestimate
+```
 
 A better measure is **frequency-including-gap-to-now**: use the span from the oldest pulse to the current time. That gives 5 pulses over 50ms = 100 Hz. The growing gap since the last pulse pulls the estimate down as the engine slows.
 
-We take the minimum of the two — min(625, 100) = 100 Hz. This gives the right answer in every regime. During steady state, both methods agree. During deceleration, the gap-to-now method is lower (correct). During acceleration, the pulse-only method is lower (also correct — you don't want to overcount based on future expectations). Without this, the tach hangs at the old RPM reading during engine braking until enough new slow pulses fill the ring buffer. Very noticeable lag on the dashboard.
+```plaintext
+real period keeps growing as we decelerate → →
+edges:  ●──●──●───●────●──────●           ┊now
+	  t₀ t₁ t₂  t₃   t₄     t₅          ┊
+	  |←─── span_pulses ───→|           ┊
+							|←── gap ──→|
+	  |←───────── span_to_now ─────────→|
 
-## Data pipeline: the WAL engine
+pulse-only = (count-1) / (t_newest - t_oldest)
+gap-to-now = count / (t_now - t_oldest)
+```
 
-The Jetson has 4GB of RAM and limited storage. My initial approach stored everything in an in-memory Map, which OOM'd at 16 million entries. A real database felt like overkill, so I built a custom write-ahead log.
+We take the minimum of the two: `min(625, 100) = 100`. This gives the right answer in every regime. During steady state, both methods agree. During deceleration, the gap-to-now method is lower (correct). During acceleration, the pulse-only method is lower (also correct, you don't want to overcount based on future expectations). Without this, the tach hangs at the old RPM reading during engine braking until enough new slow pulses fill the ring buffer.
 
-Each ingest batch becomes one JSON line with all channels merged: `{"seq":1,"ts":...,"d":{"rpm":3500,"speed":65,...}}`. Files rotate every 5,000 ticks — roughly 200 seconds of data. Each WAL file ends with a range footer (`#range:min,max`) so the index can rebuild on recovery without scanning every line. The write path is synchronous with `fsync` for durability; the read path is async and non-blocking. A lock file (`wal.lock`) prevents concurrent server instances and protects data during compaction.
+## Telemetry server
 
-## Wire format: JSON → NDJSON → MessagePack
+The Jetson has 4GB of RAM and limited storage. My initial prototype just shoved all the data in memory but on a long test drive it OOM'd at ~16 million entries. Afraid of losing data again, we built a very simple durable storage system for the entries that is basically a log-structured store.
 
-This went through three iterations. I started with `JSON.stringify` of full response arrays — on the Jetson this turned out to be the bottleneck. A single lap took 5–8 seconds to serialize. Switching to NDJSON streaming (piping raw WAL lines with zero serialization) dropped server CPU to near zero. Then I switched again to MessagePack via `msgpackr` for ~40% smaller payloads over the wire.
+```plaintext
+			append(tick)
+				 │
+				 ▼
+┌──────────── log-structured store (source of truth) ──────────┐
+│ .append → write(2) every write, fsync(2) every 100 writes    │
+│     │                                                        │
+│     ├──► live view:  emit "entry" → SSE /stream → UI         │
+│     │                                                        │
+│     └──► appended to active segment on disk  /data/wal/      │
+│           ┌────────────────────────────────────────────┐     │
+│           │ wal.000001.log  sealed   #range:1–5000     │     │
+│           │ wal.000002.log  sealed   #range:5001–10000 │     │
+│           │ wal.000003.log  ACTIVE   (appending)       │     │
+│           └────────────────────────────────────────────┘     │
+└──────────────────────────────────────────────────────────────┘
 
-## Lap detection
+history view:  getTicksInRange(seqRange) → replay segments
+                 (#range footers skip non-overlapping segments)
+```
 
-Lap detection is GPS-based, no trackside hardware needed. Each GPS point gets projected onto the nearest segment of the track centerline polyline to produce a normalized progress value from 0 to 1. A finish line crossing is detected when progress drops from above 0.85 to below 0.15 (the wraparound). First lap is automatically flagged as an out lap; stopping a session flags the current lap as an in lap.
+Durability is a tradeoff with `fsync(2)`.
 
-## Pace deltas
+  - `writeSync` = the` write(2)` syscall → bytes land in the OS page cache. Cheap. Survives a process crash (kernel keeps the cache) but not a power loss.
+  - `fsync` = force the page cache to the physical device. Expensive (a real flush + barrier). This is the only thing that survives power loss.
 
-This is the part I care most about getting right, because most consumer lap timers do it differently than we wanted.
+Most normal systems bound `fsync` frequency to around ~1 `fsync` per second (which bounds power-loss dataloss to a ~1 second window). Too much `fsync` reduces your IO throughput significantly and also increases flash wear (which matters for our system which runs off an SD card).[^2]
 
-Traditional pace delta compares elapsed time at the same point _in time_ — e.g. "at 30 seconds in, you're 0.5s ahead." The problem: if you're faster, you're at a different part of the track at the 30-second mark. You end up comparing braking into turn 5 against mid-straight before turn 4. The number is hard to act on when looking back on telemetry data.
+[^2]: Writing this in hindsight, the 4s dataloss window here (100 write window / 25 writes per second) is quite large. I might go change that to be 0.5 - 1s!
 
-Instead, we compare at the same _track position_. Build a reference curve from the best lap: for each GPS point, compute (progress, elapsed), where progress is 0–1 around the track and elapsed is time since lap start. This gives a monotonically increasing curve — "how long it took the best lap to reach each point on track."
+## Calculations
+### Lap detection
 
-To query: take the current GPS fix, project it onto the track to get progress (say 0.42), and look up the best lap's elapsed time at that same progress. If the best lap reached 0.42 at 28.3s and you're at 27.8s, delta = −0.5s — you're ahead. Since the best lap won't have a data point at exactly 0.42, linearly interpolate between the two nearest points.
+The main thing I wanted was automated lap detection logic so race engineers didn't need to manually track it.
 
-This means the delta always compares the same corner entry, the same apex, the same braking zone — regardless of pace. A driver sees "+0.3s" entering turn 7 and knows they lost time _there_, not at some time-shifted point on the track.
+I manually ended up mapping track data by making a track annotation tool that outputted the polyline for the track. This allowed me to get granular with labelling turns on Sonoma (and also make a little test track around the block which we could drive around to test).
 
-## Streaming: SRT over Tailscale
+A problem then became how we would project the _actual_ car position onto this polyline. Turns out we can just use linear algebra[^3] and project the GPS point to the nearest segment via a dot product!
 
-Video runs on GStreamer pipelines: MJPEG capture → `jpegdec` → `nvvidconv` → `nvv4l2h264enc` (hardware H.264) → MPEG-TS → SRT. Audio goes through `alsasrc` → Opus at 64kbps → MPEG-TS → SRT on port 9002.
+[^3]: This is kinda leaving out the fact that we are treating latitude/longitude as plain `(x,y)` coordinates on a flat plane but the Earth believe it or not is a sphere. Technically to be accurate we should not be using the Euclidean norm but rather the Haversine distance which computes great-circle distance (i.e. the 'surface' distance on a sphere).
 
-SRT latency is set to 100ms, which is about half the Tailscale RTT of ~150ms — enough headroom for one retransmit attempt. I initially had it at 50ms, which isn't even enough time to round-trip an ACK, let alone retransmit a dropped packet. I also reduced the GOP from 30 to 15 frames (0.5 seconds) to limit how long "bit bleeding" artifacts persist when packets drop. A clock overlay is baked into the primary stream so I can sync video to telemetry in post.
+```plaintext
+                     ● GPS reading
+                     ┊
+                     ┊ ⟂  perpendicular — keep the nearest segment
+                     ▼
+•╮              A          B
+ ╰•╮           ╭•────X─────•╮
+   ╰•╮       ╭•╯            ╰•╮
+     ╰•─────•╯                ╰•── … ──► 
 
-We ran driver communication completely separately from telemetry — just a Discord audio call. This meant that if the telemetry stack restarted (or browned out from a crank), comms stayed up. Very useful during hot pits.
+X = A + t·(B−A)                                the projection itself
 
-## What's next
+t = clamp(0, (● − A)·(B − A) / |B−A|², 1)      fraction along A→B
 
-We're racing again at Buttonwillow later this year. We want to tap brake pressure, individual gear detection, and tire and brake temps. Longer term, we want to generalize the system to other vehicles. Most of the stack is car-agnostic — the WAL, the client, the streaming, the lap detection — and the car-specific parts (sensor taps, pulse calibration) are really just a config file and a wiring afternoon. We've already had a few other Lemons teams ask about running it. For a donation to the team, Shihao and I are happy to help bootstrap you and call until the system works. We love seeing more teams have more fans cheer for them.
+progress = (segDist[A] + t·|AB|) / totalDist   arc-length, 0..1
 
-The whole system came together in about a week. Most of the code is messy, but it worked, and we made it to the grid. When I stayed out for one more lap chasing a 2:28, it was the delta on S's screen that told him to let me. I think that's the best thing a telemetry system can do — not just record what happened, but give the people in the pit enough confidence to trust the driver's instinct in the moment.
+
+- • are the polyline points of the track centerline
+- A, B are the endpoints of the cloest segment in the track
+- X is the projection of ● onto the track
+- segDist is mapping of • to cumulative distance
+- totalDist is the sum of all the distances across the points
+```
+
+A finish line crossing is detected when progress drops from above 0.85 to below 0.15 (the wraparound). First lap is automatically flagged as an out lap; stopping a session flags the current lap as an in lap.
+
+### Pace deltas
+
+A pace delta tells you how much time you are ahead or behind of your best lap at your current position on the lap.
+
+Given that we just did all that 'track progress' work to figure out lap detection, we can actually compute these deltas quite easily.
+
+We do this by first building a reference curve from the best lap. For each GPS point, store its progress and elapsed time. This gives a monotonically increasing curve that represents "how long the best lap took to reach each point on track." To query, take the current GPS position, project it to get progress (say `0.42`). If the best lap reached `0.42` at 28.3s[^4] and you're at 27.8s, `delta = −0.5s`.
+
+[^4]: The best lap won't have a point at exactly 0.42, so linearly interpolate between the two nearest.
+
+
+```plaintext
+elapsed
+
+28s ┤                     █
+    │                  █  █
+    │                  █  █
+    │                  █  █
+    │               █  █  █
+    │            █  █  █  █
+14s ┤┄┄┄┄┄┄┄┄┄█  █  █  █  █
+    │         █  █  █  █  █
+    │         █  █  █  █  █
+    │      █  █  █  █  █  █
+    │   █  █  █  █  █  █  █
+ 0s ┤█  █  █  █  █  █  █  █
+    └─────────┴──────────────► progress
+     0       0.42           1
+
+              ╵
+        query this progress
+```
+
+You can even get a full 'delta graph' mapping delta to track position by subtracting the two reference curves:
+
+```plaintext
+ Δ = this lap − best lap
+
++Δ ┤      █  █
+   │   █  █  █  █
+ 0 ┼──────────────────────────────────────► progress
+   │                  █  █  █  █  █  █
+   │                     █  █  █
+−Δ ┤                        █
+   0                                       1
+
++Δ = behind best lap
+−Δ = ahead
+ 0 = best lap (reference)
+```
+
+
+Interestingly though, my approach here differs from my understanding of what industry-standard is. Most systems integrate wheel speed into distance: $d = \int v\,dt$, reset to zero each time you cross start/finish.
+
+Then, the error in the final accumulated distance (what we'll call 'drift error') is then $e_d = \int \varepsilon_v dt$. Integrating noise is a random walk so its *variance* grows linearly with each sample: the error's standard deviation grows with $\sqrt t$.
+
+```plaintext
+e_d based on VSS
+
++ ┤                            ░░░░░░
+  │                    ░░░░░░░░░░░░░░
+  │             ░░░░░░░░░░░░░░░░░░░░░
+  │        ░░░░░░░░░░░░░░░░░░░░░░░░░░
+  │     █░█░░░░░░░░░░░░░░░░░░░░░░░░░░
+  │  ░░█░█░█░░░░░░░░░░░░░░░░░░░░░░░░░
+  │ ░░█░░░░░█░░░█░░░░░░░░░░░░░░░░░░░░
+0 ┤█░█░░░░░░░█░█░█░░░░░░░░░█░█░░░░░░░
+  │ █░░░░░░░░░█░░░█░░░░░█░█░█░█░░░░░░
+  │  ░░░░░░░░░░░░░░█░░░█░█░░░░░█░░░░░
+  │     ░░░░░░░░░░░░█░█░░░░░░░░░█░░░░
+  │        ░░░░░░░░░░█░░░░░░░░░░░█░█░
+  │             ░░░░░░░░░░░░░░░░░░█░█
+  │                    ░░░░░░░░░░░░░░
+− ┤                            ░░░░░░
+  └──────────────────────────────────► t
+
+ ░  ±σ√t envelope (typical spread)    █  one actual run (random walk)
+```
+
+Reading position directly on the other hand never integrates, so the error just sits constant at the GPS noise floor the same at lap end as at lap start.
+
+```plaintext
+e_d based on GPS
+
++ ┤░█░█░░░█░░░░░░░█░░░░░░░█░█░░░░░░░█
+0 ┤█░█░█░█░█░█░█░█░█░█░█░█░█░█░█░█░█░
+− ┤░░░░░█░░░█░█░█░░░█░█░█░░░░░█░█░█░░
+  └──────────────────────────────────► t
+
+ ░  ±σ_x band (constant)             █  one actual run
+```
+
+## Streaming
+
+Finally, the last part is how we eventually get the data off the Jetson and back to our ground station.
+
+### Overlay network
+
+Our Jetson itself connects to a 5G modem with a SIM card that we bolted to the roof of the car. This is connected to the same [[thoughts/Tailscale|Tailscale]] network as my laptop which lets both devices see each other as 'on the same network.'
+
+### Video Streaming
+
+We have two separate webcams, one for the dash view and the other for the driver view. As we used pretty cheap webcams, they didn't support native H.264 capture. Fortunately for us though, we have a Jetson Nano which we took full advantage of to encode the onboard before sending it across the wire.
+
+Our captures happening in MJPEG and we had a GStreamer pipeline that went through `jpegdec` -> `nvvidconv` -> `nvv412h264enc` -> `MPEG-TS` -> `SRT`.
+
+One thing that we had lots of trouble tweaking was what the optimal encoding + SRT settings were for our use case of low-latency unreliable streaming (as the reception on the track was definitely spotty).
+
+We saw some pretty bad 'frame bleed' where reference frames were dropped but subsequent motion deltas arrived and thus smeared the incorrect anchor frames, etc. If anyone reading this has experience working in video encoding in these environment I'd love to hear from you!
+
+## Fin
+
+This is not to say our telemetry setup is anywhere near done. There's still a lot of data around the actual [_physics_ of tire traction](https://www.youtube.com/watch?v=bYp2vvUgEqE) I'd like to get setup, along with a lot more tapping of non-ECU systems like brake temperatures, tire temperatures, gearbox position, etc.
+
+But this is also not the end of our racing story either! Our team is planning on racing again at 24h of Lemons Buttonwillow in September and hopefully we will have some interesting follow up work to write about here as well.
+
+Thank you to [Shihao](https://www.shihaocao.com/) for hacking on this with me.
+
+---
+
+You can find the code for our telemetry setup over on our [team's GitHub repository](https://github.com/Magicarp-Motors/telem).
+
+If you find this kind of stuff fascinating and want to support a group of friends working on this sort of thing, please consider sponsoring or [donating](https://donate.stripe.com/9B6cN52esdN1d3LbbOcAo00) to our team, it would really mean a lot and would help us meaningfully make this accessible to all of our team members :)
+
+![[thoughts/images/magicarp-team-photo.png|400]]
+
+
