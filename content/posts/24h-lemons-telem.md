@@ -14,7 +14,7 @@ A big part of the fun was to make our spectator experience as good as, if not be
 
 <video class="lazy" data-src="/thoughts/images/telem_review_clip.webm" autoplay loop muted></video>
 
-Part of that was making sure we could get live and accurate video and telemetry streams overlayed in a way so that people from the paddock and those at home could watch. 
+Part of that was making sure we could get live and accurate video and telemetry streams overlaid in a way so that people from the paddock and those at home could watch. 
 
 ---
 
@@ -24,7 +24,7 @@ Though the car itself is something we worked on over the course of many months, 
 
 ## Reading values
 
-The main commercial options (RaceChrono, Harry's Lap Timer) get you phone GPS (which is normally only accurate to ~10m) and maybe an OBD-II connection which lets you tap values from the ECU directly. Unfortunately for us, the Honda Accord was made in 1992 which predates the OBD-II protocol that most modern telemetry and diagnostics tools.
+The main commercial options (RaceChrono, Harry's Lap Timer) get your phone GPS (which is normally only accurate to ~10m) and maybe an OBD-II connection which lets you tap values from the ECU directly. Unfortunately for us, the Honda Accord was made in 1992 which predates the OBD-II protocol that most modern telemetry and diagnostics tools.
 
 Shihao then had the brilliant idea of just *manually tapping wires* for values we cared about.
 
@@ -90,7 +90,7 @@ A better measure is **frequency-including-gap-to-now**: use the span from the ol
 
 ```plaintext
 real period keeps growing as we decelerate → →
-edges:  ●──●──●───●────●──────●           ┊now
+edges:  ●──●──●───●────●──────●         ┊now
 	  t₀ t₁ t₂  t₃   t₄     t₅          ┊
 	  |←─── span_pulses ───→|           ┊
 							|←── gap ──→|
@@ -129,7 +129,7 @@ history view:  getTicksInRange(seqRange) → replay segments
 
 Durability is a tradeoff with `fsync(2)`.
 
-  - `writeSync` = the` write(2)` syscall → bytes land in the OS page cache. Cheap. Survives a process crash (kernel keeps the cache) but not a power loss.
+  - `writeSync` = the `write(2)` syscall → bytes land in the OS page cache. Cheap. Survives a process crash (kernel keeps the cache) but not a power loss.
   - `fsync` = force the page cache to the physical device. Expensive (a real flush + barrier). This is the only thing that survives power loss.
 
 Most normal systems bound `fsync` frequency to around ~1 `fsync` per second (which bounds power-loss dataloss to a ~1 second window). Too much `fsync` reduces your IO throughput significantly and also increases flash wear (which matters for our system which runs off an SD card).[^2]
@@ -275,13 +275,13 @@ Our Jetson itself connects to a 5G modem with a SIM card that we bolted to the r
 
 ### Video Streaming
 
-We have two separate webcams, one for the dash view and the other for the driver view. As we used pretty cheap webcams, they didn't support native H.264 capture. Fortunately for us though, we have a Jetson Nano which we took full advantage of to encode the onboard before sending it across the wire.
+We have two separate webcams, one for the dash view and the other for the driver view. As we used pretty cheap webcams, they didn't support native H.264 capture. Fortunately for us though, we have a Jetson Nano which we took full advantage of to encode the video onboard before sending it across the wire.
 
 Our captures happening in MJPEG and we had a GStreamer pipeline that went through `jpegdec` -> `nvvidconv` -> `nvv412h264enc` -> `MPEG-TS` -> `SRT`.
 
 One thing that we had lots of trouble tweaking was what the optimal encoding + SRT settings were for our use case of low-latency unreliable streaming (as the reception on the track was definitely spotty).
 
-We saw some pretty bad 'frame bleed' where reference frames were dropped but subsequent motion deltas arrived and thus smeared the incorrect anchor frames, etc. If anyone reading this has experience working in video encoding in these environment I'd love to hear from you!
+We saw some pretty bad 'frame bleed' where reference frames were dropped but subsequent motion deltas arrived and thus smeared the incorrect anchor frames, etc. If anyone reading this has experience working in video encoding in these environments I'd love to hear from you!
 
 ## Fin
 

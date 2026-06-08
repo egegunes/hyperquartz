@@ -7,9 +7,8 @@ draft: true
 ---
 *Experiments in WebGL, L-systems, and dithering*
 
-This started as a bug report. There was a dark band that showed up whenever you pinch-zoomed the page, and somewhere in trying to fix it I ended up rebuilding the whole thing into a small *komorebi* 'window' drawn entirely in a single WebGL shader.
-
-What follows is mostly notes on getting a procedural tree to actually look like a tree, and on faking sunlight coming through it.
+- havent updated my site in like 2 years
+- had this old sunlight effect but there was this weird rendering artifact
 
 ## the long detour through noise
 
