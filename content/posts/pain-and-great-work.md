@@ -88,11 +88,9 @@ draft: true
 - i like understanding the systems i like working with
 - i like when i can translate things clearly from the abstract into concrete reality
 	- understanding helps immensely with this
-	- i like software i like pottery
 - is it hard / painful?
 	- yes and frustrating
 	- but the process is fun
-
 - how much company do i like?
 	- actually most of my hobbies are pretty solitary and i like being locked in for a lot of them
 
