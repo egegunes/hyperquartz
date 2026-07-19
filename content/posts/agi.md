@@ -101,7 +101,7 @@ AI is already capable of learning, adaptation, and basic Being-in-the-world. Thu
 [^6]: Churchland, P. (1990). _Thinking: An invitation to cognitive science._ Vol. 3., pp. 199-228.
 [^7]: Goodfellow, I., Shlens, J., & Szegedy, C. (2014) _Explaining and harnessing adversarial examples._ ArXiv Preprint ArXiv: 1412.6572.
 [^8]: Crane, Tim. (2003). _The Mechanical Mind._ doi:10.4324/9780203426319.
-[^9]: Silver, D., Hubert, T., Schrittwieser, J., Antonoglou, I., Lai, M., Guez, A., ... & Lillicrap, T. (2017). _Mastering chess and shogi by self-play with a general reinforcement learning algorithm._ arXiv preprint arXiv:1712.01815.
+[^9]: Silver, D., Hubert, T., Schrittwieser, J., Antonoglou, I., Lai, M., Guez, A., ... & Lillicrap, T. (2017). _Mastering chess and shogi by self-play with a general [[thoughts/reinforcement learning|reinforcement learning]] algorithm._ arXiv preprint arXiv:1712.01815.
 [^10]: Dreyfus, Hubert L. (2008) _Why Heideggerian AI Failed and How Fixing It Would Require Making It More Heideggerian._ The Mechanical Mind in History, pp. 331–362., doi:10.7551/mitpress/9780262083775.003.0014.
 [^11]: Solomon, R. (1972), _From Rationalism to Existentialism: The Existentialists and Their Nineteenth Century Backgrounds_, Harper & Row, New York.
 [^12]: Steiner, G. (1978), _Heidegger_, The Harvester Press Limited, Sussex

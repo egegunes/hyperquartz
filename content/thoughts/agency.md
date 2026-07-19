@@ -46,7 +46,7 @@ Definitions:
 	1. Have representational states that depict how things are in the environment
 	2. Have motivational states that specify how it requires things to be in the environment
 	3. Have the capacity to process its representational and motivational states, leading it to intervene suitably in the environment whenever that environment fails to match a motivating specification.
-- Functional agency: It is common in machine learning literature to refer to AI (systems) as agents with little need for additional characterization (e.g. “multi-agent reinforcement learning,” “dialogue agent,” etc.). In these cases, agent is primarily meant as shorthand to capture particular functionality of the algorithmic object. (term mine, definition attributed to author)
+- Functional agency: It is common in machine learning literature to refer to AI (systems) as agents with little need for additional characterization (e.g. “multi-agent [[thoughts/reinforcement learning|reinforcement learning]],” “dialogue agent,” etc.). In these cases, agent is primarily meant as shorthand to capture particular functionality of the algorithmic object. (term mine, definition attributed to author)
 - Agency in the lens of how ones "moral character" might be evaluated
 	- Mechanistic agency: agency is defined primarily by the ability to take action in the world given some information
 		- It draws from the Platonic claim that virtue—that is, ethical behavior—is knowledge about what is good
