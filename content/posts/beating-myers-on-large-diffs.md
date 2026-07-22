@@ -83,7 +83,7 @@ def myers_distance(a, b):
 
 The nested loops are where $O(N \cdot D)$ comes from.
 
-Agents produce the opposite workload. Our Edit tool reads files up to 16MB, models happily rewrite blocks of thousands of lines in a single call, and `replace_all` can touch thousands of sites at once. In the large rewrite case, there are little to no matches to follow, so the band keeps widening until it covers the whole graph.
+Agents produce the opposite workload. Our Edit tool reads files up to 16MB, models happily rewrite blocks of thousands of lines in a single call, and `replace_all` can touch thousands of sites at once. In the large rewrite case, there are few to no matches to follow, so the band keeps widening until it covers the whole graph.
 
 ```plaintext /─/#path /│/#path /·/#dim
     d   r   i   f   t   w   o   o   d
@@ -106,17 +106,17 @@ m                                     │
   anywhere, so every one of the D = 16 steps is paid
 ```
 
-When most lines differ, $D$ approaches $2N$ and the search degenerates toward $O(N^2)$. That single diff took 4.3 seconds which stalls the whole agent.
+When most lines differ, $D$ approaches $2N$ and the search becomes $O(N^2)$. We had a single degenerate diff that took 4.3 seconds and stalled the whole agent!
 
 ## Building the diff from what we already know
 
-We _can_ actually take advantage of the fact that the diff we need to calculate has more information than the blind two-way diff Myers is generic enough to support.
+Turns out that there is information we are discarding here that we can use to make this diff faster.
 
-The Edit tool is a classic `str_replace` tool. It takes an `old_string` and a `new_string` and performs the replacement itself, so at the moment it writes the file, it already knows exactly which character ranges changed.
+---
 
-A diff algorithm is a way of recovering that information when you never had it. We had it and threw it away, then paid $O(N \cdot D)$ per edit to search for it again.
+The Edit tool is a classic `str_replace` tool. It takes an `old_string` and a `new_string` and performs the replacement itself. By definition, it already knows exactly which character ranges changed.
 
-The fix is to record the replacement at the moment we make it:
+What if we recorded these ranges to help us identify the hunks we need to render for the diff?
 
 ```ts
 // before: recompute the change from scratch
@@ -128,9 +128,9 @@ const { after, spans } = edit(before, oldStr, newStr)
 const patch = diffFromSpans(before, after, spans) // O(N + D)
 ```
 
-`edit` now collects the replacement spans in a single `indexOf` pass and derives the new file content from those same spans, which has the nice side effect that the diff and the written file can never disagree.
+`edit` now collects the replacement spans in a single `indexOf` pass and derives the new file content from those same spans.
 
-The builder is one pass over the spans: widen each span to the line boundaries around it, slice those lines out of both files, and merge hunks whose context would overlap.
+To build the diff, we do a single pass over the spans. For each span, widen it to the line boundaries around it, slice those lines out of both files, and merge hunks whose context would overlap.
 
 ```python
 CONTEXT = 4
@@ -170,20 +170,20 @@ The span widens to line 2's boundaries, lines 1 and 3 come along as context, and
  }
 ```
 
-You might protest that there's still an $O(N)$ hiding in here: the newline hops and the running line count are both linear scans. Two things make this less bad.
+*Hey!* I hear you complain, *there's still an $O(N)$ hiding in here!* The newline hops and the running line count are both linear scans. Two things make this less bad.
 
 1. The hops stop at the nearest line boundary, so they cost a line rather than the whole file. 
 2. The line count is at most one pass over the file, which is work the edit already does.
 
-What the spans actually get rid of is the multiplication so an edit now costs $O(N + D)$ instead of $O(N + N \cdot D)$.
+What the spans actually get rid of is the multiplication, so an edit now costs $O(N + D)$ instead of $O(N + N \cdot D)$.
 
 ## Fuzzing for correctness
 
-Generating the unified diff came with some more unexpected challenges: hunk headers, merging hunks whose context overlaps, files that don't end in a newline. 
+Generating the unified diff came with some more unexpected challenges. The diff format is surprisingly complex!
 
-Rather than trying to enumerate the corners, I wrote a fuzzing suite that treats `jsdiff` as an oracle: every diff we construct gets applied back onto the original content with `jsdiff`'s `applyPatch`, and the result must reproduce the written file identically.
+Rather than trying to enumerate the corner cases, I wrote a fuzzing suite that treats `jsdiff` as an oracle: every diff we construct gets applied back onto the original content with `jsdiff`'s `applyPatch`, and the result must reproduce the written file identically.
 
-Luckily this wasn't for naught is it caught a particularly nasty bug. When a deletion eats a line's trailing newline, the leftover text joins the _following_ line:
+Luckily this wasn't for naught as it caught a particularly nasty bug. When a deletion eats a line's trailing newline, the leftover text joins the _following_ line:
 
 ```plaintext /"XX\n"/#path /← wrong: "b" is no longer its own line/#dim
 before: "aXX\nb\n"      old_string: "XX\n"      after: "ab\n"
@@ -196,11 +196,11 @@ so the leftover "a" merges with line 2:
   +ab                       b    ← wrong: "b" is no longer its own line
 ```
 
-The naive mapping (the span touches line 1, so emit old and new versions of line 1) produces a diff that doesn't apply. I would never have thought to write this case by hand.
+After enough rounds of fuzzing, we felt confident enough to ship this to production and no longer see stalls in this codepath.
 
 ## Results
 
-Median times on my dev machine, old (`jsdiff` over full contents) vs. new (span builder):
+Median times on my dev machine, old Myers diff vs. new span approach:
 
 | Scenario                           | Old     | New    | Speedup |
 | ---------------------------------- | ------- | ------ | ------- |
