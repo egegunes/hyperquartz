@@ -371,7 +371,10 @@ body.animation-ready #quartz-body {
 
 // Reserve the box up-front (fixed height + border) so there's no layout shift
 // while Three.js lazy-loads; the canvas fades in once rendered.
-.dappled-scene {
+// .dappled-scene is the homepage banner (queried by dappledLight.inline.ts);
+// .dappled-frame is the same box for embedding dappled canvases anywhere else.
+.dappled-scene,
+.dappled-frame {
   box-sizing: border-box;
   position: relative;
   width: 100%;
@@ -398,6 +401,67 @@ body.animation-ready #quartz-body {
 @keyframes dappled-fade-in {
   to {
     opacity: 1;
+  }
+}
+
+// shared control styles: the Konami debug panel and the inline demos in
+// posts/dappled-light both use these sliders and buttons
+@mixin dappled-slider-label {
+  display: block;
+
+  span {
+    display: block;
+    margin-bottom: 3px;
+    opacity: 0.85;
+  }
+
+  // thin slider track + small thumb
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 10px;
+    background: transparent;
+    cursor: pointer;
+
+    &::-webkit-slider-runnable-track {
+      height: 2px;
+      background: color-mix(in srgb, var(--gray) 50%, transparent);
+    }
+    &::-moz-range-track {
+      height: 2px;
+      background: color-mix(in srgb, var(--gray) 50%, transparent);
+    }
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 9px;
+      height: 9px;
+      margin-top: -3.5px;
+      border-radius: 50%;
+      background: var(--secondary);
+    }
+    &::-moz-range-thumb {
+      width: 9px;
+      height: 9px;
+      border: none;
+      border-radius: 50%;
+      background: var(--secondary);
+    }
+  }
+}
+
+@mixin dappled-control-button {
+  padding: 4px 6px;
+  background: var(--lightgray);
+  color: var(--dark);
+  border: 1px solid var(--dark);
+  border-radius: 0;
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--secondary);
+    color: var(--light);
   }
 }
 
@@ -454,67 +518,16 @@ body.animation-ready #quartz-body {
   }
 
   .dappled-debug-btn {
+    @include dappled-control-button;
     display: block;
     width: 100%;
     margin: 0.3rem 0;
-    padding: 4px 6px;
-    background: var(--lightgray);
-    color: var(--dark);
-    border: 1px solid var(--dark);
-    border-radius: 0;
-    font: inherit;
     font-size: 0.7rem;
-    cursor: pointer;
-
-    &:hover {
-      background: var(--secondary);
-      color: var(--light);
-    }
   }
 
   label {
-    display: block;
+    @include dappled-slider-label;
     margin: 0.4rem 0;
-
-    span {
-      display: block;
-      margin-bottom: 3px;
-      opacity: 0.85;
-    }
-
-    // thin slider track + small thumb
-    input[type="range"] {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 100%;
-      height: 10px;
-      background: transparent;
-      cursor: pointer;
-
-      &::-webkit-slider-runnable-track {
-        height: 2px;
-        background: color-mix(in srgb, var(--gray) 50%, transparent);
-      }
-      &::-moz-range-track {
-        height: 2px;
-        background: color-mix(in srgb, var(--gray) 50%, transparent);
-      }
-      &::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        width: 9px;
-        height: 9px;
-        margin-top: -3.5px;
-        border-radius: 50%;
-        background: var(--secondary);
-      }
-      &::-moz-range-thumb {
-        width: 9px;
-        height: 9px;
-        border: none;
-        border-radius: 50%;
-        background: var(--secondary);
-      }
-    }
   }
 
   // layer / dither toggles: checkbox inline with label
@@ -535,5 +548,56 @@ body.animation-ready #quartz-body {
       margin: 0;
       opacity: 0.95;
     }
+  }
+}
+
+// inline strip of dappled controls: same sliders and buttons as the debug
+// panel, laid out as a row (pairs with a .dappled-frame/.dappled-scene above)
+.dappled-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.5rem 1.1rem;
+  margin: 0.5rem 0 1.5rem;
+  font-family: var(--codeFont, monospace);
+  font-size: 0.72rem;
+  color: var(--dark);
+
+  button {
+    @include dappled-control-button;
+    padding: 4px 8px;
+  }
+
+  label {
+    @include dappled-slider-label;
+    width: 170px;
+  }
+}
+
+// tuck the strip up under the frame it controls
+.dappled-frame + .dappled-controls,
+.dappled-scene + .dappled-controls {
+  margin-top: -1rem;
+}
+
+// edit-graph diagrams (posts/beating-myers-on-large-replaces):
+// grouped chars (/x/#id) recolor the glyph itself, no pill highlight.
+// the wrapper is a <mark>; the glyph color is an inline shiki style on
+// the inner <span>, so force it to inherit.
+pre > code mark[data-chars-id] {
+  background: none;
+  border-radius: 0;
+  color: var(--dark);
+
+  & > span {
+    color: inherit !important;
+  }
+
+  &[data-chars-id="path"] {
+    color: var(--tertiary);
+  }
+
+  &[data-chars-id="dim"] {
+    color: var(--gray);
   }
 }

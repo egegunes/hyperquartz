@@ -104,6 +104,15 @@ async function _navigate(url: URL, isBack: boolean = false) {
   // morph body
   micromorph(document.body, html.body)
 
+  // scripts swapped in with the content are inert (micromorph clones them without
+  // executing); recreate the ones inside the article so markdown-embedded scripts run
+  document.querySelectorAll("article script").forEach((el) => {
+    const fresh = document.createElement("script")
+    for (const { name, value } of Array.from(el.attributes)) fresh.setAttribute(name, value)
+    fresh.textContent = el.textContent
+    el.replaceWith(fresh)
+  })
+
   // scroll into place and add history
   if (!isBack) {
     if (url.hash) {
