@@ -1,56 +1,64 @@
 ---
 title: Experiments in procedural dappled light shaders
-date: 2026-06-01
+date: 2026-08-02
 tags:
   - technical
-draft: true
+draft: false
+socialImage: ../thoughts/images/dappled-og.png
 ---
-*Experiments in WebGL, L-systems, and dithering*
+One of my personal philosophies is that [[thoughts/websites as homes|one's personal site should feel like a digital home]]. As someone who stops to enjoy the light a lot, it felt therefore very important that my digital home had nice lighting too. For a long time, I had this dappled light effect on my website [that I made and open sourced](https://github.com/jackyzha0/sunlit).
 
-For about two years the front page of this site ran [Sunlit](https://sunlit.pages.dev/), a pure CSS scene of light streaming through a window: blinds, a leaf shadow warped by an SVG turbulence filter, a sunrise and a sunset when you toggled the theme. It was built out of stacked `backdrop-filter` strips, and Chrome had a compositing quirk where pinch-zooming smeared the strips into a dark blotch over the whole page. I spent an evening trying to fix it from the CSS side, couldn't, and pulled the effect out entirely.
+<video class="lazy" data-src="/thoughts/images/sunlit.webm" autoplay loop muted></video>
 
-![[thoughts/images/sunlit.webm]]
+At some point though, I noticed that if I had zoomed in any amount on Chrome, there was a CSS compositing bug which would render a strange black gradient over the whole site. I tried for a few hours to resolve it but found no success and so decided to rip it out entirely.
 
-That left the site plain, and left me a little restless. A bit after 1am I started on a replacement with a smaller footprint: not a whole-page effect but a single framed scene above the homepage article. A tree casting dappled light on a wall. Same width as the content, no more than 200 pixels tall, drawn only in theme colors.
+This left my site feeling a little too flat and soulless. The time was 1am and a brief scroll through my Pinterest and Google Photos gave me ample inspiration as to where to take the site next.
+
+![[thoughts/images/new-website-inspo.png]]
+
+I was thinking something with the bold colors of late 90's print tests, but still had the soul of komorebi (木漏れ日, sunlight filtering through the leaves). I found a lot of inspiration in the digital homes of [Katherine](https://kayserifserif.place/), [Henry](https://henry.codes/), and [Michael](https://www.mek.gallery/).
 
 ---
 
-The version on the [home page](/) now took about two days of iterating to land. What follows is the build log in order, with each intermediate stage rebuilt from git history and running live in this post. The sliders under some of them are lifted straight from the debug panel I used while tuning.
+## Noise and dithering
 
+The first revision was mostly figuring out how to get something that looked like shadows of leaves and trees. I thought that having thresholded Perlin noise in multiple octaves would provide a good approximation of a canopy and went with that.
 
-## two tones on a quad
+The problem is that in too high of a resolution, this the blobs look way too blob-like. I decided to purposefully render the canvas at a much lower resolution with `image-rendering: pixelated;` and dither the colorspace to give it that pixel-art bit-crunch aesthetic.
 
-The first version was the simplest thing that could plausibly read as leaves. One fullscreen triangle in raw WebGL, a fragment shader that thresholds a few octaves of value noise into blobs, and the blobs are the canopy. Light or shadow, decided per pixel.
+![[thoughts/images/bayer.png]]
 
-The scene renders at half resolution and gets scaled back up with nearest-neighbor sampling, which is where the chunky pixel look comes from. Rather than antialiasing the grey midtones, I dither them. Each pixel compares its brightness against a fixed Bayer threshold pattern and snaps to either lit or shadow, so the grey never actually exists on screen. It's an illusion made of two colors and an ordered field of dots, the same trick a newspaper or an old Game Boy uses. Because the underlying render is low resolution, the dots are big and travel with the image instead of shimmering.
+To make it feel more alive, I added some wind which was some simple translation that varied by the noise octave so the scene stirs when you wave at it and settles when you stop.
+
 
 <div class="dappled-frame"><canvas class="dappled-canvas" data-dappled-stage="1"></canvas></div>
 
-## komorebi
 
-It read as dappled light if you squinted, but it was flat. Real dappled light has a warm fringe where the sun blooms around the edge of a shadow, so I wanted a third color between the two, a gold. My first pass quantized brightness into three flat bands, and the gold sat there as a solid stripe:
+## Golden warm fringe
+
+If you squinted, it did _kind of_ look like dappled light. When I looked at my references though, it felt flat in comparison.
+
+The main thing was that real dappled light has a warm 'fringe' where the sun blooms around the edge of a shadow. I wanted a third color between the two tones to provide that effect. My first pass mapped over brightness to the old dithering code with a small band as solid gold.
+
 
 <div class="dappled-frame"><canvas class="dappled-canvas" data-dappled-stage="2"></canvas></div>
 
-Solid gold was wrong because the fringe isn't a region of the wall, it's a property of shadow edges. So the image stays two-tone at heart, and gold became a condition. A pixel can only go gold where the tone is mid-range *and* the brightness is actually changing, which I check with the local rate of change of the light. Flat interiors don't qualify. The gold also dithers on its own offset Bayer pattern instead of filling solid. All of this keeps it on the rims of soft shadows, which is where real backlit foliage catches the sun. Try pushing the band around:
+
+The solid gold felt wrong. I realized then that the color was more of a *coloring property*. So I instead changed the shader to color *post-dithering* and to only be gold if the tone is mid-range and there is a sharp gradient between light and dark (i.e. only fringes and no interiors).
+
 
 <div class="dappled-frame"><canvas class="dappled-canvas" data-dappled-stage="3"></canvas></div>
+
 <div class="dappled-controls">
     <label><span></span><input type="range" min="0" max="0.8" step="0.01" value="0.45" data-dappled-param="goldLo" data-dappled-label="gold start"></label>
     <label><span></span><input type="range" min="0.2" max="0.95" step="0.01" value="0.7" data-dappled-param="goldHi" data-dappled-label="gold end"></label>
 </div>
 
-The palette never grew past these three. The light theme is a letterpress poster, deep navy on warm cream. The dark theme is a cyanotype, and there the fringe turns into a soft penumbra dimmer than the moonlit wall, because moonlight doesn't glow.
+## Noise and L-Systems
 
-## model the tree, not the texture
+The colors mostly looked fine but the structure was still too disorganized and chaotic. It just looked like noise. It lacked the components a real tree has; there was no discernible trunk, branches, or leaves.
 
-By 2am the constants were fighting each other, every fix to the gold breaking the wind or the leaves. So I stopped tweaking and wrote down the thing I was actually trying to fake.
-
-There's wind. It comes and goes in slow 20 to 30 second cycles, and moving your cursor raises a ceiling that the gusts ride under, so the scene stirs when you wave at it and settles when you stop. There's a tree: a trunk that barely moves, thick branches, thin branches, and leaves, each layer riding the same wind with its own elasticity, the sway accumulating down the tree so the tips flutter the most. And there's the wall. Each layer reports how much light gets through at a pixel and the layers multiply, because a shadow falling on a shadow should be darker, and because solid wood times anything stays solid, so the trunk never gets brightened by the dappling around it.
-
-Writing it down also forced me to notice what the dithering actually was. How sharp a shadow is comes down to how far the thing casting it sits from the wall. The sun isn't a point, so a twig pressed against the wall throws a hard dark edge while a branch high overhead throws a soft faint one. Brightness, and therefore dithering, is purely a function of shadow sharpness. Each layer carries a blur value that is secretly a distance, and the dither *is* the penumbra.
-
-The next morning I put every constant behind a debug panel that opens with the Konami code, fps chart, wind chart, a slider for everything, because you can't design a generative system by reading its source. You reshuffle it a few hundred times and watch. By 11am it was live on the site. The commit is called `DAPPLED LIGHT YUM`.
+How do we encode that procedurally? My first attempt tried to recreate those using the same noise primitives. I stretched the 'trunk' noise heavily in the `y` direction and skewed the noise in the branch layers.
 
 <div class="dappled-frame"><canvas class="dappled-canvas" data-dappled-stage="4"></canvas></div>
 <div class="dappled-controls">
@@ -59,48 +67,147 @@ The next morning I put every constant behind a debug panel that opens with the K
     <button data-dappled-act="reseed">reseed</button>
 </div>
 
-The wind model survived every rewrite that came after. Move your mouse around quickly and the canopy stirs, stop and it eases back to the resting breeze.
 
-## noise doesn't fork
+It still didn't feel right. Especially looking at just some of the layers isolated by themselves, it looked more like connective tissue than trees and branches.
 
-I thought I was done. Then that evening I started isolating layers in the debug panel, and the branch layers alone look like this:
+If you threshold a 2D noise field you get patches. I thought Voronoi cell edges could be an interesting way to represent the branches because they form a web but it instead looked more like cracked mud. It felt that no amount of pure fragment shader-based approaches would approximate a real tree.
 
-<div class="dappled-frame"><canvas class="dappled-canvas" data-dappled-stage="5"></canvas></div>
+I did a bit of digging to see what prior art existed for generative tree shaders and came across the concept of L-systems that looked promising. It's a recursive system that allows the natural expression of organic and fractal-like forms.
 
-Not branches. Connective tissue. Nothing forks, nothing descends from a trunk, limbs float in the air attached to nothing. The branches were ridged noise, and I spent the rest of the night learning why no amount of tuning would save them.
+It is commonly defined as $G = (V, \omega, P)$, where:
 
-If you threshold a 2D noise field you get patches, not lines, and patches don't read as branches. Voronoi cell edges looked promising because the edges form one connected web, but every edge encloses a cell, so the result is cracked mud or stained glass. A tree is the opposite of that. It's open, and it never closes a loop. Iso-contours of a smooth field gave me clean connected curves, but they run roughly parallel, like a topographic map, with no sense of a trunk shedding limbs. The closest I got was a kaleidoscopic fractal tree, the kind you fold out of space with `abs()` and a rotation each step, but it's bilaterally symmetric and its canopy is roughly square. The banner is a long thin letterbox, so I was only ever seeing a horizontal slice through the middle of the tree, which is almost all trunk.
+- $V$ is the alphabet containing the set of symbols containing elements that can be replaced (variables) and those which cannot (terminal values).
+- $\omega$ is the initial state composed of a string of symbols from $V$.
+- $P$ is a set of production rules defining how variables can be replaced with combinations of variables and terminal values.
 
-The thing all of these miss is that a tree isn't a field. It's a structure with direction and lineage. Grow this way, then split into thinner children that do the same. Noise has no notion of a parent branch or a direction of growth, so there was never going to be a magic threshold that turned it into a tree. A little after midnight I gave up on noise.
+For example, the definition of a fractal plant (called the [Barnsley Fern](https://en.wikipedia.org/wiki/Barnsley_fern)) is as follows:
 
-## grow it on the CPU
+```plaintext
+variables: X, F
+constants: +, -, [, ]
+start:     -X
 
-Instead of asking the GPU to invent a tree per pixel, I grew one, once, in plain JavaScript, before drawing anything. A little turtle walks an L-system. It starts with a trunk and buds off thinner, shorter side branches as it goes, and it spits out a flat list of tapered segments. The shader's only job is to take that list and, for each pixel, find the distance to the nearest segment.
+rules:
+(X -> F+[[X]-X]-F[-FX]+X)
+(F -> FF)
+```
 
-Splitting it this way is the whole trick. The structure lives in code I can read and tune, and the drawing is dumb and parallel and fast. Almost every good decision after this point came from being able to change the tree without touching the renderer.
+And then rendering is the plant iterates rule application some number of times then feeding the resulting string through a function to interpret or map it[^1].
 
-A fractal tree and a real tree are not the same thing though, and the gap between them turned out to be two bits of actual plant biology.
+[^1]: The Barnsley Fern is rendered via a stack. `F` draws forward, `-` turns right 25 degrees, `+` turns left 25 degrees, `X` is a noop, `[` pushes the current position and angle to the stack, and `]` pops the top of the stack.
 
-The first is da Vinci's pipe model. He noticed that if you add up the thickness of all the branches at any height of a tree, you get roughly the thickness of the trunk. The modern version is that cross-sectional *area* is conserved across a fork, so two equal children are each about 0.71 times the parent's radius rather than half. I'd started with the naive version, conserving width directly, and the branches thinned so fast they died after a split or two. Conserving area instead lets a limb survive six or eight forks and taper gracefully down to a point.
+![Barnsley Fern|300](https://upload.wikimedia.org/wikipedia/commons/4/4b/Fractal_Farn.gif)
 
-The second is phyllotaxis. Plants tend to space successive branches and leaves around a stem by about 137.5 degrees, the golden angle, which is the most irrational angle there is and therefore the one that packs new growth so it shadows itself the least. I carry a phase down each branch that advances by that angle at every node, and a side shoot's placement comes from the cosine of that phase. Combined with letting the main limb keep the golden fraction of the area at each split, you get the particular rhythm real branches have, where the spacing is regular without ever being even. Drag the phyllotaxis slider to zero to let branches pick sides at random instead; it still works, but it loses the rhythm.
+I chose to implement a probabilistic grammar for the tree generation that produced what felt more like a natural branch splitting.
+
+```plaintext
+variables: X, F
+constants: +, -, [, ]
+start:     X
+
+rules:
+(X -> FX)            p = 0.30    leader extends, no fork
+(X -> F[+X]X)        p = 0.245   fork: leader + one side branch
+(X -> F[-X]X)        p = 0.245
+(X -> F[+X][-X]X)    p = 0.21    fork: leader + two side branches
+```
+
+Unlike most L-systems though, this algorithm continues unrolling it until all branches hit a terminal width. The output is a string of symbols which we can write as a list of branch/trunk segments. Then, the fragment shader just takes the resulting list of segments and, for each pixel, renders the color based on the distance to the nearest segment. I kept the leaf layer as thresholded noise.
+
+## da Vinci and the Golden Ratio
+
+As with many L-systems though, getting it to look somewhat convincing took a brief foray into plant biology.
+
+da Vinci noticed that if you add up the thickness of all the branches at any height of a tree, you get roughly the thickness of the trunk. The modern version is that cross-sectional *area* is conserved across a fork. Following this rule helps us get much more natural looking branch splits.
+
+![[thoughts/images/davinci-pipe.png]]
+
+It also turns out that the golden ratio sneaks its way into this. Real trees don't alternate sides in a strict left-right-left-right pattern. Successive buds emerge rotated ~137.5° around the stem in a spiral arrangement called [phyllotaxis](https://en.wikipedia.org/wiki/Phyllotaxis). Because the golden ratio is irrational, it guarantees that no two leaves ever follow the same radial line from center to edge.
+
+We can get a 2D approximation of this effect by keeping a running angle per branch, advancing it by the golden angle at each fork, and then using the cosine of the angle to pick the side. This produces an alternation that drifts between left and right without ever settling into a repeating pattern.
 
 <div class="dappled-frame"><canvas class="dappled-canvas" data-dappled-stage="6"></canvas></div>
 <div class="dappled-controls">
     <label><span></span><input type="range" min="0" max="1" step="0.05" value="1" data-dappled-param="golden" data-dappled-label="golden phyllotaxis"></label>
     <label><span></span><input type="range" min="0" max="0.8" step="0.02" value="0.3" data-dappled-param="curl" data-dappled-label="curl"></label>
+    <label><span></span><input type="range" min="0.4" max="1.6" step="0.01" value="0.95" data-dappled-param="conserve" data-dappled-label="volume carry"></label>
+    <label><span></span><input type="range" min="1" max="16" step="1" value="12" data-dappled-param="maxIter" data-dappled-label="iterations"></label>
     <button data-dappled-act="reshuffle">reshuffle tree</button>
 </div>
 
-That commit landed at 1am the second night. It's called `hella tweaks, thanks da vinci :)`.
+## Adding depth
 
-## the tree is a volume
+Now that the biology was mostly okay, it became important to start focusing on composition of the scene.
 
-The next day was about depth, the part I'd been getting wrong the longest. I had been filling each branch with one flat shade, which made the thick limbs read as opaque cutouts. The fix follows from the penumbra idea that was already there: the shadow darkens across a band that widens with the caster's distance. A thick limb is wider than its band, so its core still reaches full dark while the edges lighten. A thin twig is narrower than its band, so its two edges blur into each other and it never fully darkens, and the fine stuff dissolves into a softer grey on its own. I stopped having to special-case thin branches at all.
+One of the biggest simplifications I made early on was assuming that layer had a singular individual depth-value (kind of like a `z-index`).
 
-Distance also isn't one number per tree, which is the other mistake I'd been carrying. A real tree is a volume. The trunk is a column somewhere in the middle and the branches reach both toward you and away, wrapping around it. So depth wanders as the tree grows: the trunk holds a central plane, the main limb stays near it, and the side branches drift forward and back each time they fork. A single tree then carries its own range of focus, some limbs crisp and dark because they happened to land near the wall, others hazy because they drifted behind it. The leaves sit furthest out, the softest layer of all.
+A tree is a volume. The trunk is a column somewhere in the middle and the branches reach both toward you and away, wrapping around it. When rendered, this depth should come through in the brightness/dithering, with some limbs crisp and dark and others hazy.
 
-The rest is plain art direction. There are a handful of scene types, light coming from the top, from one of the top corners, or from a bottom corner, and every tree in a given scene is rooted to the same side so it reads as one light source instead of a scatter. I anchor the main trunk near a rule-of-thirds line and leave the opposite side mostly open as sky. And the roots get pushed well past the edge of the frame, so the boring straight stretch of trunk happens off-screen and you only ever see the part that has already started to fork.
+This effect was achieved by doing proper penumbral blurring in the shader. If we set a focal depth to the scene, $U = f \cdot \frac{b}{a}$ where $f$ is the focal-spot size, $a$ is the distance from camera to object, and $b$ is the distance from object to wall.
+
+```plaintext /░/#path /╱/#dim /╲/#dim /│/#dim /╳/#dim /┊/#dim
+          ●─────●            focal spot, size f
+          │╲   ╱│          ┊
+          │ ╲ ╱ │          ┊
+          │  ╳  │          a
+          │ ╱ ╲ │          ┊
+          │╱   ╲│          ┊
+          ███████            branch
+         ╱│     │╲         ┊
+        ╱ │     │ ╲        ┊
+       ╱  │     │  ╲       b
+      ╱   │     │   ╲      ┊
+     ╱    │     │    ╲     ┊
+────░░░░░░███████░░░░░░────  wall
+    └─ U ─┘
+  a point inside the fringe sees only part of the focal spot; U
+  grows with b, so limbs far from the wall blur wide and limbs
+  near it stay crisp
+```
+
+This was mostly for the branch and trunk segments though as the leaf layer would be too computationally expensive to do for each leaf. Instead, I opted for a depth gradient which multiplied the noise threshold. I also added a 'depth following parameter' to made sure to nudge the depth of the leaves to follow the depth of the branch when they are nearby. The resulting effect is a nice variation in the canopy density.
+
+```plaintext /┄/#path /·/#dim
+  flat threshold, one altitude for the whole layer
+
+            ╱╲
+     ╱╲    ╱  ╲
+  ┄┄╱┄┄╲┄┄╱┄┄┄┄╲┄┄┄┄┄┄╱╲┄┄┄┄┄┄╱╲┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄    threshold
+   ╱    ╲╱      ╲    ╱  ╲    ╱  ╲    ╱╲  ╱╲  ╱╲  ╱╲  ╱╲     noise
+  ╱              ╲  ╱    ╲  ╱    ╲  ╱  ╲╱  ╲╱  ╲╱  ╲╱  ╲
+                  ╲╱      ╲╱      ╲╱
+
+  ···██····████·········································    canopy
+
+  with a depth gradient, the threshold tilts across the layer
+
+            ╱╲
+  ┄┄┄╱╲┄┄┄┄╱┄ ╲
+    ╱  ╲  ╱  ┄┄╲┄┄┄┄┄┄╱╲      ╱╲
+   ╱    ╲╱      ╲    ╱  ╲┄┄┄┄╱┄┄╲┄┄  ╱╲  ╱╲  ╱╲  ╱╲  ╱╲
+  ╱              ╲  ╱    ╲  ╱    ╲ ┄╱┄┄╲╱┄┄╲╱┄ ╲╱  ╲╱  ╲
+                  ╲╱      ╲╱      ╲╱          ┄┄┄┄┄┄┄┄┄┄
+
+  ··········███···············██·····██··██··███████████    canopy
+
+  canopy = the stretches of noise poking above the threshold
+```
+
+<div class="dappled-frame"><canvas class="dappled-canvas" data-dappled-stage="8"></canvas></div>
+<div class="dappled-controls">
+    <label><span></span><input type="range" min="0" max="3" step="0.05" value="1.4" data-dappled-param="leafFall" data-dappled-label="canopy falloff"></label>
+    <label><span></span><input type="range" min="0" max="1" step="0.02" value="0.6" data-dappled-param="leafFollow" data-dappled-label="depth follow"></label>
+    <button data-dappled-act="reshuffle">reshuffle tree</button>
+</div>
+
+
+As a nice bonus, we can use these depth values for parallax! As your mouse moves across the page, each layer slides sideways in proportion to its distance from the wall, giving it a more embodied sense of depth in addition to the blurring above.
+
+## Composition
+
+The rest of the polish was just applying good principles of photography.
+
+There should be areas that draw your attention and focus. Variations in texture, color, and light can be used to that effect. Depth and parallax and help focus your attention on what is sharp. We can align trunks and branches which serve as subjects along a rule-of-thirds line. Leave purposeful empty space.
 
 <div class="dappled-frame"><canvas class="dappled-canvas" data-dappled-stage="7"></canvas></div>
 <div class="dappled-controls">
@@ -109,16 +216,9 @@ The rest is plain art direction. There are a handful of scene types, light comin
     <button data-dappled-act="reshuffle">reshuffle tree</button>
 </div>
 
-## fin
-
-The finished scene is on the [home page](/), growing a new tree on every load. If you want to take it apart yourself, the arrows still work: up up down down left right left right.
+When these [[thoughts/A Pattern Language|patterns]] are combined and adhered to, the composition starts to feel interesting each time it is rendered. Truly happy that I feel so much joy upon visiting my own home page!
 
 <script>
-// Live demos of the shader's intermediate stages, reconstructed from git
-// history (stages 4/6/7 are ports of committed code; 1-3/5 rebuild
-// uncommitted states from the prompt logs). Runs entirely inside this post:
-// each canvas tagged data-dappled-stage above gets its own tiny WebGL program.
-// Initializes on Quartz's 'nav' event on a direct load of this page.
 ;(() => {
   if (window.__dappledIterDemos) return
   window.__dappledIterDemos = true
@@ -219,7 +319,7 @@ The finished scene is on the [home page](/), growing a new tree on every load. I
     gl_FragColor = vec4(col, 1.0);
   }`
 
-  // stages 4-5: port of commit 5f3a17a599 (DAPPLED LIGHT YUM)
+  // stage 4: port of commit 5f3a17a599 (DAPPLED LIGHT YUM)
   const FRAG_V1 = `#extension GL_OES_standard_derivatives : enable
   precision highp float;
   uniform float uTime;
@@ -482,8 +582,9 @@ The finished scene is on the [home page](/), growing a new tree on every load. I
     const GOLDEN = Math.PI * (3 - Math.sqrt(5))
     const drift = (depth, amt) =>
       0 >= amt ? depth : Math.min(0.98, Math.max(0.02, depth + (rng() - 0.5) * amt))
-    const grow = (x, y, ang, width, curl, phase, depth) => {
-      if (minW > width || segs.length >= MAXSEG) return
+    const maxIter = tree.maxIter || 99
+    const grow = (x, y, ang, width, curl, phase, depth, iter) => {
+      if (iter >= maxIter || minW > width || segs.length >= MAXSEG) return
       const len = Math.min(width * tree.lenRatio, tree.maxLen) * (0.85 + rng() * 0.3)
       const a = ang + curl + (rng() - 0.5) * 0.05
       const ex = x + Math.cos(a) * len
@@ -493,14 +594,14 @@ The finished scene is on the [home page](/), growing a new tree on every load. I
       const totalA = wEnd * wEnd * tree.conserve
       if (1 > tree.forkProb) {
         if (rng() >= tree.forkProb) {
-          grow(ex, ey, a, Math.sqrt(totalA), curl, phase + GOLDEN, drift(depth, tree.depthDrift * 0.25))
+          grow(ex, ey, a, Math.sqrt(totalA), curl, phase + GOLDEN, drift(depth, tree.depthDrift * 0.25), iter + 1)
           return
         }
       }
       const n = tree.split3 > rng() ? 3 : 2
       const leaderA = totalA * (tree.leader * (0.92 + rng() * 0.16))
       const wLeader = Math.sqrt(Math.min(totalA, leaderA))
-      grow(ex, ey, a, wLeader, curl, phase + GOLDEN, drift(depth, tree.depthDrift * 0.25))
+      grow(ex, ey, a, wLeader, curl, phase + GOLDEN, drift(depth, tree.depthDrift * 0.25), iter + 1)
       let remA = Math.max(0, totalA - wLeader * wLeader)
       for (let k = 0; n - 1 > k; k++) {
         const ac = k === n - 2 ? remA : remA * (0.45 + rng() * 0.25)
@@ -512,7 +613,26 @@ The finished scene is on the [home page](/), growing a new tree on every load. I
         const side = lat >= 0 ? 1 : -1
         const thin = 1 - Math.min(1, wc / Math.max(wEnd, 1e-6))
         const sa = a + side * (0.35 + thin * 0.55) + (rng() - 0.5) * 0.15
-        grow(ex, ey, sa, wc, (rng() - 0.5) * tree.curl, ph, drift(depth, tree.depthDrift))
+        grow(ex, ey, sa, wc, (rng() - 0.5) * tree.curl, ph, drift(depth, tree.depthDrift), iter + 1)
+      }
+    }
+    if (tree.bottomUp) {
+      // no scene logic: root each tree just below the bottom edge, growing up
+      const nTrees = Math.max(1, Math.round(tree.nTrees))
+      for (let i = 0; nTrees > i; i++) {
+        if (segs.length >= MAXSEG) break
+        const fx = clampN((i + 0.5) / nTrees + (rng() - 0.5) * 0.2, 0.06, 0.94)
+        const w = tree.trunkWidth * (0.9 + rng() * 0.2)
+        grow(fx * aspect, -tree.rootOffset, Math.PI / 2 + (rng() - 0.5) * 0.25, w, (rng() - 0.5) * tree.curl, rng() * Math.PI * 2, 0, 0)
+      }
+      return {
+        segs,
+        posScale: aspect + 2,
+        leafG: [0, 1],
+        trunkCount: 0,
+        trunkX0: 0.5,
+        trunkX1: 0.5,
+        trunkW: 0.01,
       }
     }
     const sceneIdx = tree.sceneType >= 0 ? Math.min(4, Math.round(tree.sceneType)) : Math.floor(rng() * SCENES.length)
@@ -541,7 +661,7 @@ The finished scene is on the [home page](/), growing a new tree on every load. I
       const base = tree.depthMode === 'v2' ? role : clampN(0.12 + role * 0.4 + (rng() - 0.5) * 0.1, 0.04, 0.95)
       const [x, y, ang] = rootForEdge(edge, role)
       const w = tree.trunkWidth * (1 - role * 0.5) * (0.9 + rng() * 0.2)
-      grow(x, y, ang, w, (rng() - 0.5) * tree.curl, rng() * Math.PI * 2, base)
+      grow(x, y, ang, w, (rng() - 0.5) * tree.curl, rng() * Math.PI * 2, base, 0)
     }
     return {
       segs,
@@ -580,16 +700,22 @@ The finished scene is on the [home page](/), growing a new tree on every load. I
   }
 
   const V2_TREE = {
-    sceneType: -1, nTrees: 6, trunkWidth: 0.035, lenRatio: 16, maxLen: 0.4,
+    bottomUp: true, nTrees: 2, trunkWidth: 0.05, lenRatio: 16, maxLen: 0.16,
     curl: 0.3, split3: 0.3, forkProb: 1, depthDrift: 0, leader: 0.618,
-    golden: 1, conserve: 0.95, endPx: 0.5, rootOffset: 0.05,
-    trunks: false, depthMode: 'v2',
+    golden: 1, conserve: 0.95, endPx: 0.5, rootOffset: 0.02,
+    trunks: false, depthMode: 'v2', maxIter: 12,
   }
   const HEAD_TREE = {
     sceneType: -1, nTrees: 6, trunkWidth: 0.035, lenRatio: 16, maxLen: 0.4,
     curl: 0.3, split3: 0.3, forkProb: 0.7, depthDrift: 0.4, leader: 0.618,
     golden: 1, conserve: 0.95, endPx: 0.5, rootOffset: 0.9,
     trunks: true, depthMode: 'head',
+  }
+  const LEAF_TREE = {
+    bottomUp: true, nTrees: 2, trunkWidth: 0.05, lenRatio: 16, maxLen: 0.16,
+    curl: 0.3, split3: 0.3, forkProb: 0.7, depthDrift: 0.5, leader: 0.618,
+    golden: 1, conserve: 0.95, endPx: 0.5, rootOffset: 0.02,
+    trunks: false, depthMode: 'head', maxIter: 12,
   }
 
   // palette: read the site's komorebi vars so light/dark themes just work
@@ -661,7 +787,7 @@ The finished scene is on the [home page](/), growing a new tree on every load. I
       visible: true,
       noiseSeed: [Math.random() * 1000, Math.random() * 1000],
       layerOn: [1, 1, 1, 1],
-      params: { goldLo: 0.45, goldHi: 0.7, windScale: 1, blurW: 0.8 },
+      params: { goldLo: 0.45, goldHi: 0.7, windScale: 1, blurW: 0.8, leafFall: 1.4, leafFollow: 0.6 },
       disp: new Float32Array(8),
       u1f: (n, v) => gl.uniform1f(loc(n), v),
       u1i: (n, v) => gl.uniform1i(loc(n), v),
@@ -752,7 +878,7 @@ The finished scene is on the [home page](/), growing a new tree on every load. I
       d.u1f('uWidScale', WIDSCALE)
       d.u1i('uSegCount', d.segCount)
       d.u2f('uLeafGrad', d.tree.leafG[0], d.tree.leafG[1])
-      d.u1f('uLeafFall', 1.4)
+      d.u1f('uLeafFall', d.params.leafFall)
     }
 
     const blobFrame = (mode, layers) => (d, t, env) => {
@@ -795,20 +921,15 @@ The finished scene is on the [home page](/), growing a new tree on every load. I
       2: (c) => makeDemo(c, FRAG_BLOB, { frame: blobFrame(1, 3) }),
       3: (c) => makeDemo(c, FRAG_BLOB, { frame: blobFrame(2, 3) }),
       4: (c) => makeDemo(c, FRAG_V1, { frame: v1Frame }),
-      5: (c) =>
-        makeDemo(c, FRAG_V1, {
-          init: (d) => (d.layerOn = [0, 1, 1, 0]),
-          frame: v1Frame,
-        }),
       6: (c) =>
         makeDemo(c, FRAG_LSYS_V2, {
           init: (d) => setupLSys(d, Object.assign({}, V2_TREE)),
           onResize: (d) => { if (d.rebuild) d.rebuild() },
           frame: (d, t, env) => {
             lsysCommonUniforms(d, t, env)
-            d.u4f('uLayerOn', 0, 1, 0, 1)
+            d.u4f('uLayerOn', 0, 1, 0, 0)
             d.u4f('uBlur', 0.0, 0.12, 0.35, 0.45)
-            d.u1f('uParallax', env.parallax)
+            d.u1f('uParallax', 0)
             d.u3fv('uFloor', [0.1, 0.4, 0.7])
             d.draw()
           },
@@ -827,6 +948,23 @@ The finished scene is on the [home page](/), growing a new tree on every load. I
             d.u1f('uTrunkCount', d.tree.trunkCount)
             d.u2f('uTrunkX', d.tree.trunkX0, d.tree.trunkX1)
             d.u1f('uTrunkW', d.tree.trunkW)
+            d.draw()
+          },
+        }),
+      8: (c) =>
+        makeDemo(c, FRAG_FINAL, {
+          init: (d) => setupLSys(d, Object.assign({}, LEAF_TREE)),
+          onResize: (d) => { if (d.rebuild) d.rebuild() },
+          frame: (d, t, env) => {
+            lsysCommonUniforms(d, t, env)
+            d.u4f('uLayerOn', 0, 1, 0, 1)
+            d.u4f('uBlur', 0.0, 0.12, 0.35, 0.45)
+            d.u1f('uParallax', env.parallax)
+            d.u3fv('uFloor', [0.1, 0.4, 0.7])
+            d.u1f('uLeafFollow', d.params.leafFollow)
+            d.u1f('uTrunkCount', 0)
+            d.u2f('uTrunkX', 0.5, 0.5)
+            d.u1f('uTrunkW', 0.01)
             d.draw()
           },
         }),
@@ -853,6 +991,7 @@ The finished scene is on the [home page](/), growing a new tree on every load. I
           if (act === 'reshuffle')
             el.addEventListener('click', () => {
               d.treeSeed = Math.floor(Math.random() * 1e9)
+              d.noiseSeed = [Math.random() * 1000, Math.random() * 1000]
               if (d.rebuild) d.rebuild()
               if (reduce) drawAll()
             })
@@ -860,8 +999,9 @@ The finished scene is on the [home page](/), growing a new tree on every load. I
         fig.querySelectorAll('input[data-dappled-param]').forEach((sl) => {
           const key = sl.dataset.dappledParam
           const span = sl.parentElement ? sl.parentElement.querySelector('span') : null
+          const digits = parseFloat(sl.step) >= 1 ? 0 : 2
           const setLabel = (v) => {
-            if (span) span.textContent = (sl.dataset.dappledLabel || key) + ': ' + v.toFixed(2)
+            if (span) span.textContent = (sl.dataset.dappledLabel || key) + ': ' + v.toFixed(digits)
           }
           setLabel(parseFloat(sl.value))
           sl.addEventListener('input', () => {

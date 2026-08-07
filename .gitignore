@@ -7,6 +7,7 @@ tsconfig.tsbuildinfo
 .obsidian
 .quartz-cache
 private/
+content/thoughts/tbd.md
 .replit
 replit.nix
 *.mov
