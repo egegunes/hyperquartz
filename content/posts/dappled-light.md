@@ -6,17 +6,17 @@ tags:
 draft: false
 socialImage: ../thoughts/images/dappled-og.png
 ---
-One of my personal philosophies is that [[thoughts/websites as homes|one's personal site should feel like a digital home]]. As someone who stops to enjoy the light a lot, it felt therefore very important that my digital home had nice lighting too. For a long time, I had this dappled light effect on my website [that I made and open sourced](https://github.com/jackyzha0/sunlit).
+One of my personal philosophies is that [[thoughts/websites as homes|one's personal site should feel like a digital home]]. As someone who stops to enjoy the light a lot, I felt it was very important that my digital home have nice lighting too. For a long time, I had this dappled light effect on my website [that I made and open-sourced](https://github.com/jackyzha0/sunlit).
 
 <video class="lazy" data-src="/thoughts/images/sunlit.webm" autoplay loop muted></video>
 
-At some point though, I noticed that if I had zoomed in any amount on Chrome, there was a CSS compositing bug which would render a strange black gradient over the whole site. I tried for a few hours to resolve it but found no success and so decided to rip it out entirely.
+At some point though, I noticed that if I zoomed in any amount on Chrome, there was a CSS compositing bug which would render a strange black gradient over the whole site. I tried for a few hours to resolve it but found no success and so decided to rip it out entirely.
 
-This left my site feeling a little too flat and soulless. The time was 1am and a brief scroll through my Pinterest and Google Photos gave me ample inspiration as to where to take the site next.
+This left my site feeling a little too flat and soulless. The time was 1am, and a brief scroll through my Pinterest and Google Photos gave me ample inspiration as to where to take the site next.
 
 ![[thoughts/images/new-website-inspo.png]]
 
-I was thinking something with the bold colors of late 90's print tests, but still had the soul of komorebi (木漏れ日, sunlight filtering through the leaves). I found a lot of inspiration in the digital homes of [Katherine](https://kayserifserif.place/), [Henry](https://henry.codes/), and [Michael](https://www.mek.gallery/).
+I was thinking something with the bold colors of late 90s print tests, but with the soul of komorebi (木漏れ日, sunlight filtering through the leaves). I found a lot of inspiration in the digital homes of [Katherine](https://kayserifserif.place/), [Henry](https://henry.codes/), and [Michael](https://www.mek.gallery/).
 
 ---
 
@@ -24,11 +24,11 @@ I was thinking something with the bold colors of late 90's print tests, but stil
 
 The first revision was mostly figuring out how to get something that looked like shadows of leaves and trees. I thought that having thresholded Perlin noise in multiple octaves would provide a good approximation of a canopy and went with that.
 
-The problem is that in too high of a resolution, this the blobs look way too blob-like. I decided to purposefully render the canvas at a much lower resolution with `image-rendering: pixelated;` and dither the colorspace to give it that pixel-art bit-crunch aesthetic.
+The problem is that at too high of a resolution, the blobs look way too... blob-like. I decided to purposefully render the canvas at a much lower resolution with `image-rendering: pixelated;` and dither the colorspace to give it that pixel-art bit-crunch aesthetic.
 
 ![[thoughts/images/bayer.png]]
 
-To make it feel more alive, I added some wind which was some simple translation that varied by the noise octave so the scene stirs when you wave at it and settles when you stop.
+To make it feel more alive, I added some wind, which was some simple translation that varied by the noise octave, so the scene stirs when you wave at it and settles when you stop.
 
 
 <div class="dappled-frame"><canvas class="dappled-canvas" data-dappled-stage="1"></canvas></div>
@@ -38,13 +38,13 @@ To make it feel more alive, I added some wind which was some simple translation 
 
 If you squinted, it did _kind of_ look like dappled light. When I looked at my references though, it felt flat in comparison.
 
-The main thing was that real dappled light has a warm 'fringe' where the sun blooms around the edge of a shadow. I wanted a third color between the two tones to provide that effect. My first pass mapped over brightness to the old dithering code with a small band as solid gold.
+The main thing was that real dappled light has a warm 'fringe' where the sun blooms around the edge of a shadow. I wanted a third color between the two tones to provide that effect. My first pass used a small band of solid gold.
 
 
 <div class="dappled-frame"><canvas class="dappled-canvas" data-dappled-stage="2"></canvas></div>
 
 
-The solid gold felt wrong. I realized then that the color was more of a *coloring property*. So I instead changed the shader to color *post-dithering* and to only be gold if the tone is mid-range and there is a sharp gradient between light and dark (i.e. only fringes and no interiors).
+The more I looked though, the more solid gold felt wrong. I realized then that the color was more of a *coloring property*. So I instead changed the shader to color *post-dithering* and to only be gold if the tone is mid-range and there is a sharp gradient between light and dark (i.e., only fringes and no interiors).
 
 
 <div class="dappled-frame"><canvas class="dappled-canvas" data-dappled-stage="3"></canvas></div>
@@ -68,11 +68,11 @@ How do we encode that procedurally? My first attempt tried to recreate those usi
 </div>
 
 
-It still didn't feel right. Especially looking at just some of the layers isolated by themselves, it looked more like connective tissue than trees and branches.
+It still didn't feel right. Especially when looking at just some of the layers isolated by themselves, it looked more like connective tissue than trees and branches.
 
-If you threshold a 2D noise field you get patches. I thought Voronoi cell edges could be an interesting way to represent the branches because they form a web but it instead looked more like cracked mud. It felt that no amount of pure fragment shader-based approaches would approximate a real tree.
+If you threshold a 2D noise field, you get patches. I thought Voronoi cell edges could be an interesting way to represent the branches because they form a web, but it instead looked more like cracked mud. It felt like no amount of pure fragment shader-based approaches would approximate a real tree.
 
-I did a bit of digging to see what prior art existed for generative tree shaders and came across the concept of L-systems that looked promising. It's a recursive system that allows the natural expression of organic and fractal-like forms.
+I did a bit of digging to see what prior art existed for generative tree shaders and came across the concept of L-systems which are recursive systems that allow the natural expression of organic and fractal-like forms.
 
 It is commonly defined as $G = (V, \omega, P)$, where:
 
@@ -92,13 +92,13 @@ rules:
 (F -> FF)
 ```
 
-And then rendering is the plant iterates rule application some number of times then feeding the resulting string through a function to interpret or map it[^1].
+And then rendering the plant is iterating rule application some number of times, then feeding the resulting string through a function to interpret or map it[^1].
 
 [^1]: The Barnsley Fern is rendered via a stack. `F` draws forward, `-` turns right 25 degrees, `+` turns left 25 degrees, `X` is a noop, `[` pushes the current position and angle to the stack, and `]` pops the top of the stack.
 
 ![Barnsley Fern|300](https://upload.wikimedia.org/wikipedia/commons/4/4b/Fractal_Farn.gif)
 
-I chose to implement a probabilistic grammar for the tree generation that produced what felt more like a natural branch splitting.
+I chose to implement a probabilistic grammar for the tree generation that produced what felt more like natural branch splitting.
 
 ```plaintext
 variables: X, F
@@ -112,13 +112,13 @@ rules:
 (X -> F[+X][-X]X)    p = 0.21    fork: leader + two side branches
 ```
 
-Unlike most L-systems though, this algorithm continues unrolling it until all branches hit a terminal width. The output is a string of symbols which we can write as a list of branch/trunk segments. Then, the fragment shader just takes the resulting list of segments and, for each pixel, renders the color based on the distance to the nearest segment. I kept the leaf layer as thresholded noise.
+Unlike most L-systems though, this algorithm continues unrolling until all branches hit a terminal width. The output is a string of symbols which we can write as a list of branch/trunk segments. Then, the fragment shader just takes the resulting list of segments and, for each pixel, renders the color based on the distance to the nearest segment. I kept the leaf layer as thresholded noise.
 
 ## da Vinci and the Golden Ratio
 
 As with many L-systems though, getting it to look somewhat convincing took a brief foray into plant biology.
 
-da Vinci noticed that if you add up the thickness of all the branches at any height of a tree, you get roughly the thickness of the trunk. The modern version is that cross-sectional *area* is conserved across a fork. Following this rule helps us get much more natural looking branch splits.
+da Vinci noticed that if you add up the thickness of all the branches at any height of a tree, you get roughly the thickness of the trunk. The modern version is that cross-sectional *area* is conserved across a fork. Following this rule helps us get much more natural-looking branch splits.
 
 ![[thoughts/images/davinci-pipe.png]]
 
@@ -137,13 +137,13 @@ We can get a 2D approximation of this effect by keeping a running angle per bran
 
 ## Adding depth
 
-Now that the biology was mostly okay, it became important to start focusing on composition of the scene.
+Now that the biology was mostly okay, it became important to start focusing on the composition of the scene.
 
-One of the biggest simplifications I made early on was assuming that layer had a singular individual depth-value (kind of like a `z-index`).
+One of the biggest simplifications I made early on was assuming that each layer had a singular individual depth-value (kind of like a `z-index`).
 
-A tree is a volume. The trunk is a column somewhere in the middle and the branches reach both toward you and away, wrapping around it. When rendered, this depth should come through in the brightness/dithering, with some limbs crisp and dark and others hazy.
+A tree is a volume. The trunk is a column somewhere in the middle, and the branches reach both toward you and away, wrapping around it. When rendered, this depth should come through in the brightness/dithering, with some limbs crisp and dark and others hazy.
 
-This effect was achieved by doing proper penumbral blurring in the shader. If we set a focal depth to the scene, $U = f \cdot \frac{b}{a}$ where $f$ is the focal-spot size, $a$ is the distance from camera to object, and $b$ is the distance from object to wall.
+This effect was achieved by doing proper penumbral blurring in the shader. If we set a focal depth for the scene, $U = f \cdot \frac{b}{a}$, where $f$ is the focal-spot size, $a$ is the distance from camera to object, and $b$ is the distance from object to wall.
 
 ```plaintext /░/#path /╱/#dim /╲/#dim /│/#dim /╳/#dim /┊/#dim
           ●─────●            focal spot, size f
@@ -165,7 +165,7 @@ This effect was achieved by doing proper penumbral blurring in the shader. If we
   near it stay crisp
 ```
 
-This was mostly for the branch and trunk segments though as the leaf layer would be too computationally expensive to do for each leaf. Instead, I opted for a depth gradient which multiplied the noise threshold. I also added a 'depth following parameter' to made sure to nudge the depth of the leaves to follow the depth of the branch when they are nearby. The resulting effect is a nice variation in the canopy density.
+This was mostly for the branch and trunk segments though, as the leaf layer would be too computationally expensive to do for each leaf. Instead, I opted for a depth gradient which multiplied the noise threshold. I also added a 'depth following parameter' to nudge the depth of the leaves to follow the depth of the branch when they are nearby. The resulting effect is a nice variation in the canopy density.
 
 ```plaintext /┄/#path /·/#dim
   flat threshold, one altitude for the whole layer
@@ -207,7 +207,7 @@ As a nice bonus, we can use these depth values for parallax! As your mouse moves
 
 The rest of the polish was just applying good principles of photography.
 
-There should be areas that draw your attention and focus. Variations in texture, color, and light can be used to that effect. Depth and parallax and help focus your attention on what is sharp. We can align trunks and branches which serve as subjects along a rule-of-thirds line. Leave purposeful empty space.
+There should be areas that draw your attention and focus. Variations in texture, color, and light can be used to that effect. Depth and parallax help focus your attention on what is sharp. We can align trunks and branches, which serve as subjects, along a rule-of-thirds line. Leave purposeful empty space.
 
 <div class="dappled-frame"><canvas class="dappled-canvas" data-dappled-stage="7"></canvas></div>
 <div class="dappled-controls">
@@ -216,7 +216,11 @@ There should be areas that draw your attention and focus. Variations in texture,
     <button data-dappled-act="reshuffle">reshuffle tree</button>
 </div>
 
-When these [[thoughts/A Pattern Language|patterns]] are combined and adhered to, the composition starts to feel interesting each time it is rendered. Truly happy that I feel so much joy upon visiting my own home page!
+When these [[thoughts/A Pattern Language|patterns]] are combined and adhered to, the composition begins to feel interesting. Each intersection of trunks, branches, leaves, and light are new each time!
+
+I'm really glad for that one random Chrome bug that kicked off my sudden itch to redo the site -- it feels as if I have a whole new digital home!
+
+Thanks for reading, I hope you stay a while.
 
 <script>
 ;(() => {
