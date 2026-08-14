@@ -610,3 +610,9 @@ pre > code mark[data-chars-id] {
     color: var(--gray);
   }
 }
+
+.page-listing li.section-li>.section .meta {
+    opacity: .6;
+    margin: 0px 1em 0px 0px;
+    min-width: max-content;
+}
