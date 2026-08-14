@@ -4,20 +4,10 @@ import { SimpleSlug } from "./quartz/util/path"
 
 const recentNotes = [
   Component.RecentNotes({
-    title: "Selected Writing",
-    limit: 4,
-    filter: (f) =>
-      f.slug!.startsWith("posts/") &&
-      f.slug! !== "posts/index" &&
-      !f.frontmatter?.noindex &&
-      !(f.frontmatter?.tags ?? []).includes("personal"),
+    title: "Recent Posts",
+    limit: 5,
+    filter: (f) => f.slug!.startsWith("posts/") && f.slug! !== "posts/index",
     linkToMore: "posts/" as SimpleSlug,
-  }),
-  Component.RecentNotes({
-    title: "Recent Notes",
-    limit: 2,
-    filter: (f) => f.slug!.startsWith("thoughts/"),
-    linkToMore: "thoughts/" as SimpleSlug,
   }),
 ]
 
@@ -27,10 +17,7 @@ export const sharedPageComponents: SharedLayout = {
   header: [],
   afterBody: [...recentNotes.map((c) => Component.MobileOnly(c))],
   footer: Component.Footer({
-    links: {
-      GitHub: "https://github.com/jackyzha0",
-      Twitter: "https://twitter.com/_jzhao",
-    },
+    links: { },
   }),
 }
 
