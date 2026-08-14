@@ -364,10 +364,12 @@ body.animation-ready #quartz-body {
   --komorebi-center: 0.38;
 }
 
-// Reserve the box up-front (fixed height + border) so there's no layout shift
-// while Three.js lazy-loads; the canvas fades in once rendered.
-// .dappled-scene is the homepage banner (queried by dappledLight.inline.ts);
-// .dappled-frame is the same box for embedding dappled canvases anywhere else.
+// Reserve the box up-front (fixed height + border) so there's no layout shift;
+// the canvas fades in once rendered.
+// .hypertext-scene is the homepage banner (queried by hypertextParallax.inline.ts);
+// .dappled-scene/.dappled-frame are the same box for embedding dappled canvases
+// (see dappledLight.inline).
+.hypertext-scene,
 .dappled-scene,
 .dappled-frame {
   box-sizing: border-box;
@@ -387,10 +389,22 @@ body.animation-ready #quartz-body {
     animation: dappled-fade-in 0.8s ease forwards;
   }
 
+  & > .hypertext-canvas {
+    display: block; // rendered at device resolution, so no pixelated upscale
+    opacity: 0;
+    animation: dappled-fade-in 0.8s ease forwards;
+  }
+
   // on mobile the header stacks directly above the content, so add breathing room
   @media all and ($mobile) {
     margin-top: 1.5rem;
   }
+}
+
+// the hypertext canvas paints the page background itself, so the frame gap
+// matches it (the komorebi gap color is tuned for the dappled palette instead)
+.hypertext-scene {
+  background-color: var(--light);
 }
 
 @keyframes dappled-fade-in {

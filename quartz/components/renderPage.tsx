@@ -266,7 +266,7 @@ export function renderPage(
                     beforeBody.map((BodyComponent) => <BodyComponent {...componentData} />)}
                 </div>
               </div>
-              {slug === "index" && <div class="dappled-scene" aria-hidden="true"></div>}
+              {slug === "index" && <div class="hypertext-scene" aria-hidden="true"></div>}
               <Content {...componentData} />
               <hr />
               <div class="page-footer">
