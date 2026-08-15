@@ -15,7 +15,7 @@ const config: QuartzConfig = {
       provider: "plausible",
     },
     locale: "en-US",
-    baseUrl: "jzhao.xyz",
+    baseUrl: "hypersubject.net",
     ignorePatterns: ["private", "templates"],
     defaultDateType: "created",
     theme: {
@@ -71,7 +71,7 @@ const config: QuartzConfig = {
       }),
       Plugin.GitHubFlavoredMarkdown(),
       Plugin.TableOfContents(),
-      Plugin.CrawlLinks({ markdownLinkResolution: "shortest", lazyLoad: true }),
+      Plugin.CrawlLinks({ markdownLinkResolution: "relative", lazyLoad: true }),
       Plugin.Description(),
       Plugin.Latex({ renderEngine: "katex" }),
     ],
