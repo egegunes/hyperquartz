@@ -84,6 +84,8 @@ const config: QuartzConfig = {
       Plugin.ContentIndex({
         enableSiteMap: true,
         enableRSS: true,
+        rssFullHtml: true,
+        rssFilter: (data) => data.relativePath?.startsWith("posts/") && data.slug! !== "posts/index" && data.frontmatter?.rss !== false,
       }),
       Plugin.Assets(),
       Plugin.Static(),

@@ -4,6 +4,7 @@ import { getDate } from "../../components/Date"
 import { escapeHTML } from "../../util/escape"
 import { FilePath, FullSlug, SimpleSlug, joinSegments, simplifySlug } from "../../util/path"
 import { QuartzEmitterPlugin } from "../types"
+import { QuartzPluginData } from "../vfile"
 import { toHtml } from "hast-util-to-html"
 import { write } from "./helpers"
 import { i18n } from "../../i18n"
@@ -28,6 +29,7 @@ interface Options {
   rssFullHtml: boolean
   rssSlug: string
   includeEmptyFiles: boolean
+  rssFilter?: (data: QuartzPluginData) => boolean | undefined
 }
 
 const defaultOptions: Options = {
@@ -37,6 +39,7 @@ const defaultOptions: Options = {
   rssFullHtml: false,
   rssSlug: "index",
   includeEmptyFiles: true,
+  rssFilter: () => true,
 }
 
 function generateSiteMap(cfg: GlobalConfiguration, idx: ContentIndexMap): string {
@@ -99,11 +102,12 @@ export const ContentIndex: QuartzEmitterPlugin<Partial<Options>> = (opts) => {
     async *emit(ctx, content) {
       const cfg = ctx.cfg.configuration
       const linkIndex: ContentIndexMap = new Map()
+      const rssIndex: ContentIndexMap = new Map()
       for (const [tree, file] of content) {
         const slug = file.data.slug!
         const date = getDate(ctx.cfg.configuration, file.data) ?? new Date()
         if (opts?.includeEmptyFiles || (file.data.text && file.data.text !== "")) {
-          linkIndex.set(slug, {
+          const details: ContentDetails = {
             slug,
             filePath: file.data.relativePath!,
             title: file.data.frontmatter?.title!,
@@ -115,7 +119,11 @@ export const ContentIndex: QuartzEmitterPlugin<Partial<Options>> = (opts) => {
               : undefined,
             date: date,
             description: file.data.description ?? "",
-          })
+          }
+          linkIndex.set(slug, details)
+          if (opts?.enableRSS && Boolean(opts?.rssFilter ? opts.rssFilter(file.data) : true)) {
+            rssIndex.set(slug, details)
+          }
         }
       }
 
@@ -131,7 +139,7 @@ export const ContentIndex: QuartzEmitterPlugin<Partial<Options>> = (opts) => {
       if (opts?.enableRSS) {
         yield write({
           ctx,
-          content: generateRSSFeed(cfg, linkIndex, opts.rssLimit),
+          content: generateRSSFeed(cfg, rssIndex, opts.rssLimit),
           slug: (opts?.rssSlug ?? "index") as FullSlug,
           ext: ".xml",
         })
