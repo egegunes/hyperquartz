@@ -57,11 +57,14 @@ function generateSiteMap(cfg: GlobalConfiguration, idx: ContentIndexMap): string
 function generateRSSFeed(cfg: GlobalConfiguration, idx: ContentIndexMap, limit?: number): string {
   const base = cfg.baseUrl ?? ""
 
+  // a literal `]]>` would close the CDATA section early, so split it across two sections
+  const escapeCDATA = (s?: string) => (s ?? "").replaceAll("]]>", "]]]]><![CDATA[>")
+
   const createURLEntry = (slug: SimpleSlug, content: ContentDetails): string => `<item>
     <title>${escapeHTML(content.title)}</title>
     <link>https://${joinSegments(base, encodeURI(slug))}</link>
     <guid>https://${joinSegments(base, encodeURI(slug))}</guid>
-    <description><![CDATA[ ${content.richContent ?? content.description} ]]></description>
+    <description><![CDATA[ ${escapeCDATA(content.richContent ?? content.description)} ]]></description>
     <pubDate>${content.date?.toUTCString()}</pubDate>
   </item>`
 
@@ -115,7 +118,7 @@ export const ContentIndex: QuartzEmitterPlugin<Partial<Options>> = (opts) => {
             tags: file.data.frontmatter?.tags ?? [],
             content: file.data.text ?? "",
             richContent: opts?.rssFullHtml
-              ? escapeHTML(toHtml(tree as Root, { allowDangerousHtml: true }))
+              ? toHtml(tree as Root, { allowDangerousHtml: true })
               : undefined,
             date: date,
             description: file.data.description ?? "",
