@@ -60,7 +60,7 @@ export const CrawlLinks: QuartzTransformerPlugin<Partial<Options>> = (userOpts) 
                 const isExternal = isAbsoluteUrl(dest)
                 classes.push(isExternal ? "external" : "internal")
 
-                if (isExternal && opts.externalLinkIcon) {
+                if (isExternal && opts.externalLinkIcon && !classes.includes("no-external-icon")) {
                   node.children.push({
                     type: "element",
                     tagName: "svg",
