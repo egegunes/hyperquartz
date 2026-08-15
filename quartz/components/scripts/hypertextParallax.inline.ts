@@ -47,6 +47,10 @@ const CANON = [
   "vibepression",
   "the inner-anarchist",
   "it's okay",
+  "sculpting",
+  "art",
+  "revolution",
+  "weekly-update",
 ]
 
 type Fragment = {
