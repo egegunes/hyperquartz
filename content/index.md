@@ -6,7 +6,9 @@ Hi! I'm ege. Welcome to my corner of cyberspace.
 
 The following is for you to make sense of who I am. It is an attempt to make myself legible to you. So you can label and categorize me and decide if I'm worthy of your time and attention.  
 
-If you'd rather check out my posts, [click here](http://localhost:8080/posts).
+If you'd rather check out my posts, [click here](posts).
+
+If you wish to add my blog to your RSS feed, [here's the link](/index.xml).
 
 ### About me
 
