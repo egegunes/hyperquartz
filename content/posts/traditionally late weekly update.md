@@ -4,6 +4,9 @@ title: traditionally late weekly update
 date: 2026-06-08
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/06/traditionally-late-weekly-update
+  - /entries/2026/06/traditionally-late-weekly-update/index
 ---
 _I do strength training with a personal trainer 3-4 times a week. Almost every time I'm a few minutes late and I always inform him that I'll be late. He says I'm so traditionally late that I don't even need to mention it. I guess the same applies to my weekly updates._
 

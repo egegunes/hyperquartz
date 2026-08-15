@@ -4,6 +4,9 @@ title: Fairfly
 date: 2026-06-21
 tags:
   - review
+aliases:
+  - /entries/2026/06/fairfly
+  - /entries/2026/06/fairfly/index
 ---
 Yesterday we saw the new play by our comrades in [Antrakt7](https://www.instagram.com/antrakt7tiyatro/): Fairfly. It's a play written by the Catalan author Joan Yago which tells the story of four white-collar workers who, upon getting the news of their potential layoff, decide to "change the world."
 

@@ -3,6 +3,9 @@ note-type: blog
 title: we must reclaim the cyberspace
 date: 2026-01-01T12:33:17+03:00
 tags:
+aliases:
+  - /entries/2026/01/we-must-reclaim-the-cyberspace
+  - /entries/2026/01/we-must-reclaim-the-cyberspace/index
 ---
 **The internet I grew up in no longer exists.**
 

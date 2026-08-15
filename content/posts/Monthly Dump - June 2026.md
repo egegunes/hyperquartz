@@ -4,6 +4,9 @@ title: "Monthly Dump: June 2026"
 date: 2026-06-30
 tags:
   - monthly-dump
+aliases:
+  - /entries/2026/06/monthly-dump
+  - /entries/2026/06/monthly-dump/index
 ---
 ## Read & enjoyed:
 

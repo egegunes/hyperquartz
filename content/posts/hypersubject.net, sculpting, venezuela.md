@@ -4,6 +4,9 @@ title: hypersubject.net, sculpting, venezuela
 date: 2026-01-04
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/01/hypersubject.net-and-sculpting
+  - /entries/2026/01/hypersubject.net-and-sculpting/index
 ---
 I’m excited for 2026.
 

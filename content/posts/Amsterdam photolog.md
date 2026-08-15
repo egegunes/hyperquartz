@@ -4,6 +4,9 @@ title: Amsterdam photolog
 date: 2026-03-29
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/03/amsterdam-photolog
+  - /entries/2026/03/amsterdam-photolog/index
 ---
 
 ![](https://hypersubject.b-cdn.net/images/2026-03-amsterdam-photolog/IMG_0019.jpeg)

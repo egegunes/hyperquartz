@@ -3,6 +3,9 @@ note-type: blog
 title: The Designated Rebel
 date: 2026-02-27
 tags:
+aliases:
+  - /entries/2026/02/the-designated-rebel
+  - /entries/2026/02/the-designated-rebel/index
 ---
 A while ago, during a sprint retrospective, I suggested significant changes to our "Definition of Done." When I finished, the room went quiet. What did that silence mean?
 

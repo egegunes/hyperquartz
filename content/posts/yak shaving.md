@@ -4,6 +4,9 @@ title: yak shaving
 date: 2026-07-19
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/07/yak-shaving
+  - /entries/2026/07/yak-shaving/index
 ---
 I continued the pending repair work in the new apartment. Last week's focus was mostly electrical infrastructure which by the way is something I understand but find horrifying, compared to water infrastructure which I don't understand and find boring.
 

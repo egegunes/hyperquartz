@@ -4,6 +4,9 @@ title: The Beast
 date: 2026-07-12
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/07/the-beast
+  - /entries/2026/07/the-beast/index
 ---
 Last week was mostly spent working through the minor troubles with the new apartment. I bought two repeaters to fix the wifi coverage and a new TV. Some problematic infrastructure has been repaired but there's still some work to do.  
 

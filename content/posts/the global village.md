@@ -4,6 +4,9 @@ title: the global village
 date: 2026-03-15
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/03/the-global-village
+  - /entries/2026/03/the-global-village/index
 ---
 _I wish I could share all the love that's in my heart_
 _Remove all the bars that keep us apart_

@@ -4,6 +4,9 @@ title: OtonomArt, Ernest Cole and audiobooks
 date: 2026-01-11
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/01/otonomart-ernestcole-audiobooks
+  - /entries/2026/01/otonomart-ernestcole-audiobooks/index
 ---
 ## OtonomArt
 

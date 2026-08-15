@@ -5,6 +5,9 @@ date: 2026-07-08
 tags:
   - books
   - review
+aliases:
+  - /entries/2026/07/book-review-the-time-regulation-institute
+  - /entries/2026/07/book-review-the-time-regulation-institute/index
 ---
 Ahmet Hamdi Tanpınar's The Time Regulation Institute is a novel about a (fictional) Institute founded to synchronize every clock in Istanbul, and then in all of Turkey. The book is generally read as a satirical allegory of modernization in Turkey. The Institute is bureaucracy *par excellence* with its preference for the appearance of work over the work itself and its founder's motto that "The Institute as a modern organization is going to create its own work instead of working on something concrete."
 

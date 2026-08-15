@@ -4,6 +4,9 @@ title: the last 20%
 date: 2026-04-05
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/04/the-last-20
+  - /entries/2026/04/the-last-20/index
 ---
 *Random thoughts on the passing week.*
 

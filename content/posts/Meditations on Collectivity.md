@@ -3,6 +3,9 @@ note-type: blog
 title: Meditations on Collectivity
 date: 2026-02-09
 tags:
+aliases:
+  - /entries/2026/02/meditations-on-collectivity
+  - /entries/2026/02/meditations-on-collectivity/index
 ---
 _I wrote five different paragraphs to start this post and couldn't stitch any of them together. So here are all five fragments._
 

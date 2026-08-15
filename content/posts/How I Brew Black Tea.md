@@ -3,6 +3,9 @@ note-type: blog
 title: How I Brew Black Tea
 date: 2026-06-24T17:37:24+03:00
 tags: []
+aliases:
+  - /entries/2026/06/how-i-brew-black-tea
+  - /entries/2026/06/how-i-brew-black-tea/index
 ---
 
 We drink a LOT of tea in Turkey. Happy? Let's drink tea. Sad? Drink tea. Tired? Tea. Relaxed? TEA. I also enjoy brewing tea in the evenings, especially when we have guests. But I was very frustrated with the inconsistency of my tea brewing. One day I decided to apply what I'd learned from brewing coffee to brewing tea.

@@ -5,6 +5,9 @@ date: 2026-07-20
 tags:
   - books
   - review
+aliases:
+  - /entries/2026/07/book-review-to-have-or-to-be
+  - /entries/2026/07/book-review-to-have-or-to-be/index
 ---
 The [Frankfurt School](https://en.wikipedia.org/wiki/Frankfurt_School) has a special place in history. It's an object of hatred for both ends of the political spectrum. [Leftists](https://thephilosophicalsalon.com/the-cia-the-frankfurt-schools-anti-communism/), especially Marxists, hate them for diluting revolutionary thought and creating a version of the Left that is "compatible" with the capitalist ruling class. [Rightists](https://en.wikipedia.org/wiki/Cultural_Marxism_conspiracy_theory) hate them for giving birth to identity politics and political correctness. However, it's a mistake to think of the Frankfurt School as a single harmonious entity. While it's true that the school consisted of thinkers on the left side of the spectrum, their thoughts were diverse and not always compatible with each other. Nevertheless, they shared an ethos of human emancipation and mostly had the same view on why it keeps failing to happen: "The revolutionary promise of the 19th century has failed and the reason is the culture."
 

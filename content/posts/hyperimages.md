@@ -4,6 +4,9 @@ title: hyperimages
 date: 2026-03-22
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/03/hyperimages
+  - /entries/2026/03/hyperimages/index
 ---
 *i'm writing this in amsterdam. i'll be in the city for kubecon till friday. let me know if you want to meet!*
 

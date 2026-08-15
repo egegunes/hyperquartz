@@ -4,6 +4,9 @@ title: my sculpture grew hair
 date: 2026-08-02
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/08/my-sculpture-grew-hair
+  - /entries/2026/08/my-sculpture-grew-hair/index
 ---
 I got sick. I don't know how I managed to catch a flu-like virus in the middle of the summer, but I did. Funny, in English you say "catch a virus" but in Turkish we say "get caught by a virus". I don't know who caught whom, but I had been under the weather since Tuesday.
 

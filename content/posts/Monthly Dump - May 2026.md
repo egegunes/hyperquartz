@@ -4,6 +4,9 @@ title: "Monthly Dump: May 2026"
 date: 2026-05-31
 tags:
   - monthly-dump
+aliases:
+  - /entries/2026/05/may-2026-monthly-dump
+  - /entries/2026/05/may-2026-monthly-dump/index
 ---
 
 ## Things I read (and enjoyed)

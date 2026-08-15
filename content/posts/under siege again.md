@@ -4,6 +4,9 @@ title: under siege again
 date: 2026-06-28
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/06/under-siege-again
+  - /entries/2026/06/under-siege-again/index
 ---
 - Writing this on a Beyoğlu day under siege again, *sigh*. The whole neighborhood is locked down just because some people want to celebrate who they are...
 - We started packing today and I'll be writing next week's update in our new apartment. Even though I don't feel excited about leaving our neighborhood, I'm excited to leave this apartment and finally be done with this whole moving thing.

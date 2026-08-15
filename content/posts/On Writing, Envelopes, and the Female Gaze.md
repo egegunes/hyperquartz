@@ -4,6 +4,9 @@ title: On Writing, Envelopes, and the Female Gaze
 date: 2026-02-22
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/02/on-writing-envelopes-and-the-female-gaze
+  - /entries/2026/02/on-writing-envelopes-and-the-female-gaze/index
 ---
 _Another Sunday, another weekly reflection post._
 

@@ -4,6 +4,9 @@ title: charging my battery
 date: 2026-04-26
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/04/charging-my-battery
+  - /entries/2026/04/charging-my-battery/index
 ---
 *Sunday reflection on the passing week.*
 

@@ -4,6 +4,9 @@ title: days passing
 date: 2026-06-14
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/06/days-passing
+  - /entries/2026/06/days-passing/index
 ---
 - Days feel like they are compressed lately. I don't feel like I'm attending life that seriously. This is not an unfamiliar feeling, to be honest. When this happens, I always find myself saying: "I know days are passing but I don't know if the time is progressing."
 - A few months ago, I mentioned that I'm giving audiobooks a chance. As of yesterday, I concluded the experiment and once more decided that audiobooks are not for me. Although the listening experience was enjoyable, I don't have that much opportunity to wear headphones and listen to a book, and when I have the opportunity it's usually for a brief period (10-15 mins), during which I usually prefer listening to something on YouTube. Because of this, the book I was listening to, The Time Regulation Institute, was waiting unattended even though I was enjoying it very much. I decided to continue reading it as an ebook.

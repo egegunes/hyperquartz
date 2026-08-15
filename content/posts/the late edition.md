@@ -4,6 +4,9 @@ title: the late edition
 date: 2026-05-11
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/05/the-late-edition
+  - /entries/2026/05/the-late-edition/index
 ---
 
 _One day late reflection on the previous week._

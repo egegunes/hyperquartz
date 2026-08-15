@@ -4,6 +4,9 @@ title: blind spot
 date: 2026-08-09
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/08/blind-spot
+  - /entries/2026/08/blind-spot/index
 ---
 > \- What a week, huh?  
 > \- Captain, it's only Wednesday.

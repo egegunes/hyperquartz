@@ -3,6 +3,9 @@ note-type: blog
 title: read-it-never
 date: 2026-07-21
 tags:
+aliases:
+  - /entries/2026/07/read-it-never
+  - /entries/2026/07/read-it-never/index
 ---
 What’s the point of putting things into my read-it-later app? 
 

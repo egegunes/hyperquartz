@@ -3,6 +3,9 @@ note-type: blog
 title: antilibrary
 date: 2026-05-18
 tags:
+aliases:
+  - /entries/2026/05/antilibrary
+  - /entries/2026/05/antilibrary/index
 ---
 
 I have too many books, especially in digital form. Whenever a book piques my interest, I immediately seek it out, acquire it by any means possible, and at least read its table of contents. This of course results in piles of books that I will never manage to read. As my knowledge expands, the pile keeps getting bigger.

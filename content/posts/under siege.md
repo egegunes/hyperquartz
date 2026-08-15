@@ -4,6 +4,9 @@ title: under siege
 date: 2026-03-08
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/03/under-siege
+  - /entries/2026/03/under-siege/index
 ---
 2026 is definitely the year of blogging for me. I already published twice as many posts as I did last year. Last Friday I published [a post](https://ege.dev/posts/watching-it-shatter/) in my technical blog in the same vein as this post: a reflection on the week. Today I posted [another one](https://ege.dev/posts/women-who-shaped-me/) there about the women who shaped me in my career. Happy Women's Day to all women around the world!
 

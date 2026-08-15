@@ -4,6 +4,9 @@ title: fragmented updates
 date: 2026-05-31
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/05/fragmented-updates
+  - /entries/2026/05/fragmented-updates/index
 ---
 *A lot was happening this week. So here are fragmented updates instead of a single overarching theme.*
 

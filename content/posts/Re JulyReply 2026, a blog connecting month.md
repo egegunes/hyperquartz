@@ -4,6 +4,9 @@ title: "Re: JulyReply 2026, a blog connecting month"
 date: 2026-07-01
 tags:
   - JulyReply
+aliases:
+  - /entries/2026/07/re-julyreply-2026-a-blog-connecting-month
+  - /entries/2026/07/re-julyreply-2026-a-blog-connecting-month/index
 ---
 Robert has a lot of stuff up his sleeve for connecting bloggers around the smallweb. After an amazing Junited 2026, now it’s time for [JulyReply 2026](https://robertbirming.com/julyreply-2026-blog-connecting/)!
 

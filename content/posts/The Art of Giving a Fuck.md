@@ -4,6 +4,9 @@ title: The Art of Giving a Fuck
 date: 2026-01-18
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/01/the-art-of-giving-a-fuck
+  - /entries/2026/01/the-art-of-giving-a-fuck/index
 ---
 
 This was a busy week and an even busier weekend. 

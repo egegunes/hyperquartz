@@ -4,6 +4,9 @@ title: boxes
 date: 2026-07-05
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/07/boxes
+  - /entries/2026/07/boxes/index
 ---
 Finally the moving is behind us and I'm writing this at our new apartment. I feel a huge weight has been lifted from my shoulders.
 

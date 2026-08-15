@@ -4,6 +4,9 @@ title: smallweb is becoming an archipelago
 date: 2026-06-09
 tags:
   - smallweb
+aliases:
+  - /entries/2026/06/smallweb-is-becoming-an-archipelago
+  - /entries/2026/06/smallweb-is-becoming-an-archipelago/index
 ---
 The appeal of living in a small town is being surrounded by the right number of people whom you can care about. On the other hand, living in a big city might make you feel lonely in huge crowds.
 

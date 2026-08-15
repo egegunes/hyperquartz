@@ -3,6 +3,9 @@ note-type: blog
 title: i didn't quit
 date: 2026-04-21
 tags:
+aliases:
+  - /entries/2026/04/i-didnt-quit
+  - /entries/2026/04/i-didnt-quit/index
 ---
 i decided to quit smoking on april 19 almost two months ago. i told my wife, my colleagues, my friends. the week before the 19th, i smoked all my cigarettes mindfully, knowing that i wouldn't have this sensation soon.
 

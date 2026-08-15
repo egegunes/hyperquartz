@@ -4,6 +4,9 @@ title: I failed JulyReply
 date: 2026-08-01
 tags:
   - "#JulyReply"
+aliases:
+  - /entries/2026/08/i-failed-julyreply
+  - /entries/2026/08/i-failed-julyreply/index
 ---
 July came and went and I didn’t write a reply post to anyone.
 

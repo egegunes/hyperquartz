@@ -4,6 +4,9 @@ title: libres, ensemble.
 date: 2026-02-04
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/02/libres-ensemble
+  - /entries/2026/02/libres-ensemble/index
 ---
 
 Richard Stallman had a Marxian effect on technology in the 1980s. He started the Free Software movement. His ideas mobilized a vast number of programmers and the ideology he initiated still has a great gravity in the software ecosystem. Since the year 2000, thousands of developers travel to Brussels every February like pilgrims for Free and Open Source Software Developers' European Meeting (FOSDEM). I am proud to be among the pilgrims for the second year in a row.

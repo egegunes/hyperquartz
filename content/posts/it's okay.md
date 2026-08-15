@@ -4,6 +4,9 @@ title: it's okay
 date: 2026-01-26
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/01/its-okay
+  - /entries/2026/01/its-okay/index
 ---
 Weekends feel busier than weekdays lately. Time flew, and I just noticed that I didn't manage to finish this week's post. This was bound to happen. It's okay. Shhh... it's okay. IT'S OKAY! Discipline is not punching yourself into the mold of a wireheaded soldier. Discipline is the ability to flow around, between, and through various slip-ups. Discipline is persistently looking at the horizon. Okay, I needed this pep talk.
 

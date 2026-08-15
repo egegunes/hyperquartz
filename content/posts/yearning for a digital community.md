@@ -4,6 +4,9 @@ title: yearning for a digital community
 date: 2026-02-15
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/02/yearning-for-a-digital-community
+  - /entries/2026/02/yearning-for-a-digital-community/index
 ---
 I find myself once again yearning for a digital community. I believe the future of social media (for me) is some kind of invite-only group chat where the conversation flows like a river. It might live in Discord, Slack or even IRC, I don't care[^1]. Physical community is important but as a millennial I need text-based friendships too.
 

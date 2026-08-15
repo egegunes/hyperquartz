@@ -3,6 +3,9 @@ note-type: blog
 title: digital communities i found in the wild
 date: 2026-05-28
 tags:
+aliases:
+  - /entries/2026/05/digital-communities-i-found-in-the-wild
+  - /entries/2026/05/digital-communities-i-found-in-the-wild/index
 ---
 [A few months ago](https://hypersubject.net/entries/2026/02/yearning-for-a-digital-community/) I was reflecting on my need for a digital community:
 

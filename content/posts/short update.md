@@ -4,6 +4,9 @@ title: short update
 date: 2026-04-12
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/04/short-update
+  - /entries/2026/04/short-update/index
 ---
 *I'm writing this in haste before packing my laptop for travel. This will be a short one.*
 

@@ -4,6 +4,9 @@ title: blogroll
 date: 2026-07-27
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/07/blogroll
+  - /entries/2026/07/blogroll/index
 ---
 *one day late edition. again.*
 

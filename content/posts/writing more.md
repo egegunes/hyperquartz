@@ -4,6 +4,9 @@ date: 2026-02-08T19:21:17+03:00
 tags:
   - writing
   - weekly-update
+aliases:
+  - /entries/2026/02/writing-more
+  - /entries/2026/02/writing-more/index
 ---
 
 At the beginning of this year, I decided to merge all things I wrote in different corners of the internet. After 5 weeks of that experiment, I decided otherwise. My old writings are worthy in their respective contexts. Visitors of this blog are probably not interested in technical posts about Kubernetes nor political posts about Turkey. And I am not interested in writing about them here.

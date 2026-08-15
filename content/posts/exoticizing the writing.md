@@ -4,6 +4,9 @@ title: exoticizing the writing
 date: 2026-05-16
 tags:
   - writing
+aliases:
+  - /entries/2026/05/exoticizing-the-writing
+  - /entries/2026/05/exoticizing-the-writing/index
 ---
 one of the most eye-opening videos on youtube for me was anna p. foxen's [exoticizing the impossible](https://www.youtube.com/watch?v=KYWl8m562vM), in which she talks about a common spiritual failure mode where the practitioner, being overfocused on the extraordinary, misses the beauty in mundane reality.
 

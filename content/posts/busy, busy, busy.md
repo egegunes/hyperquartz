@@ -4,6 +4,9 @@ title: busy, busy, busy
 date: 2026-03-01
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/03/busy-busy-busy
+  - /entries/2026/03/busy-busy-busy/index
 ---
 _Another Sunday, another weekly reflection._
 

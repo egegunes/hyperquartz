@@ -3,6 +3,9 @@ note-type: blog
 title: Against the Non-Normie
 date: 2026-02-13
 tags:
+aliases:
+  - /entries/2026/02/against-the-non-normie
+  - /entries/2026/02/against-the-non-normie/index
 ---
 "Normie" is a volatile term. Depending on the context, it might refer to atheists, New Agers, people who watch Netflix, people who don't do drugs, conservatives, liberals, people who care about politics, people who don't care about politics, people who are optimistic about the future, people who are pessimistic about the future, people who read only fiction, people who don't read at all, people who read Kant, people who enjoy dancing in the club, people who don't enjoy dancing, or people who are monogamous. In the end, "normie" is a signifier that points to the outgroup.
 

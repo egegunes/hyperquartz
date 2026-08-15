@@ -4,6 +4,9 @@ title: the inner-anarchist concedes
 date: 2026-04-19
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/04/the-inner-anarchist-concedes
+  - /entries/2026/04/the-inner-anarchist-concedes/index
 ---
 _I was in Antalya, Turkey for the company offsite last week. This is a reflection on the past week._
 

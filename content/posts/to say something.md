@@ -3,6 +3,9 @@ note-type: blog
 title: to say something
 date: 2026-02-11
 tags:
+aliases:
+  - /entries/2026/02/to-say-something
+  - /entries/2026/02/to-say-something/index
 ---
 Just finished another session of psychoanalysis. Analysis is by far the thing I least enjoy every week. I mean, it works, at least for me, but it's definitely not something I look forward to. Because it demands me to say the Thing.
 

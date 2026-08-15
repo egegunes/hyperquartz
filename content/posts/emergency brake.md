@@ -4,6 +4,9 @@ title: emergency brake
 date: 2026-05-25
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/05/emergency-brake
+  - /entries/2026/05/emergency-brake/index
 ---
 It was a packed weekend, so I couldn't publish the weekly update on Sunday. Another one-day-late edition.
 

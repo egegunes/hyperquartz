@@ -3,6 +3,9 @@ note-type: blog
 title: integrating standard.site with my hugo blog
 date: 2026-06-07
 tags:
+aliases:
+  - /entries/2026/06/integrating-standard.site-with-my-hugo-blog
+  - /entries/2026/06/integrating-standard.site-with-my-hugo-blog/index
 ---
 If you are part of indieweb, you probably noticed people talking about [standard.site](https://standard.site/). It's a recent addition to [AT Protocol](https://atproto.com/) to publish long form content. You might think of it as [POSSE](https://indieweb.org/POSSE) on steroids.
 

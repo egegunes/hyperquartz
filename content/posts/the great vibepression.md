@@ -3,6 +3,9 @@ note-type: blog
 title: the great vibepression
 date: 2026-01-05
 tags:
+aliases:
+  - /entries/2026/01/the-great-vibepression
+  - /entries/2026/01/the-great-vibepression/index
 ---
 Why are vibes so bad when economic metrics don't look that bad? [Scott Alexander](https://www.astralcodexten.com/p/vibecession-much-more-than-you-wanted) tries to find an answer to this question. [Zvi](https://thezvi.wordpress.com/2025/12/22/the-revolution-of-rising-expectations/) too.
 

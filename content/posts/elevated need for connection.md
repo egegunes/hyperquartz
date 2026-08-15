@@ -4,6 +4,9 @@ title: elevated need for connection
 date: 2026-06-21
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/06/elevated-need-for-connection
+  - /entries/2026/06/elevated-need-for-connection/index
 ---
 
 Happy Summer Solstice and Father's Day!

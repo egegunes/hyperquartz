@@ -4,6 +4,9 @@ title: Oblique Art
 date: 2026-05-03
 tags:
   - weekly-update
+aliases:
+  - /entries/2026/05/oblique-art
+  - /entries/2026/05/oblique-art/index
 ---
 
 Contemporary art is often criticized for being extravagant, farfetched or nonsensical. You might think of the paintings and movies of David Lynch, sculptures of Miquel Barceló or even the banana (Comedian) of Maurizio Cattelan. They are definitely strange and hard to interpret, and in Cattelan's case, give the finger to Art as an institutional practice. I have no problems with this kind of art. I don't think the artist owes me any meaning. Even if the artwork seems straightforward, it is still too easy to misinterpret. My sculpting tutor made a sculpture of an anorexic girl with a VERY visible vagina and still, people keep thinking it's a male...

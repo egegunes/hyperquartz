@@ -4,6 +4,9 @@ title: accidentally rediscovered the cure for writer's block
 date: 2026-07-10
 tags:
   - writing
+aliases:
+  - /entries/2026/07/accidentally-rediscovered-the-cure-for-writers-block
+  - /entries/2026/07/accidentally-rediscovered-the-cure-for-writers-block/index
 ---
 "If you can't write it, write about it." I read this advice to overcome writer's block in a blog post some time ago but I didn't attach much importance to it. I usually don't register much of the advice I read online. I maintain a somewhat cynical view of it—I believe such advice is usually written by people who are clueless about the issue. However, I recently experienced firsthand how effective this advice is while struggling to write a review of The Time Regulation Institute.  
 

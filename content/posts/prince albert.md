@@ -3,6 +3,9 @@ note-type: blog
 title: prince albert
 date: 2026-03-28
 tags:
+aliases:
+  - /entries/2026/03/prince-albert
+  - /entries/2026/03/prince-albert/index
 ---
 group chat is silent. no one responds to your invitation. it’s okay. it’s been months since you walked aimlessly in the streets. didn’t you miss being a flaneur?
 
