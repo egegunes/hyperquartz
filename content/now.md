@@ -4,7 +4,7 @@ title: "Now"
 
 *This is a /now page. Read more about /now pages at [nownownow.com](https://nownownow.com/about).*
 
-Last updated: 2026-08-10
+Last updated: 2026-08-15
 
 Doing:
 - **Sculpting**: I'm spending 5-6 hours every week making sculptures from clay. My first sculpture, [*Syzygy*](https://hypersubject.net/entries/2026/05/syzygy-photolog/), was exhibited in May. I'm now working on my second sculpture which is a female torso.

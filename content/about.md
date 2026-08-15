@@ -1,10 +1,10 @@
 ---
 title: 'About'
 ---
-
 Hi, I'm ege. I live in Istanbul, Turkey.
 
-{{< figure width=400 src="https://hyperimages.net/photos/70/photo-0.jpeg" caption="This is how I look as of February 2026." >}}
+![|500](https://hyperimages.net/photos/70/photo-0.jpeg)
+This is how I look as of February 2026.
 
 I'm a developer by trade, sysadmin at heart. I love building things, but I really shine when everything's on fire.
 
