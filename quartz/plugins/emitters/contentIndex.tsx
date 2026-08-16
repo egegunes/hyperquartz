@@ -30,6 +30,7 @@ interface Options {
   rssSlug: string
   includeEmptyFiles: boolean
   rssFilter?: (data: QuartzPluginData) => boolean | undefined
+  rssLinkParams: string
 }
 
 const defaultOptions: Options = {
@@ -40,6 +41,7 @@ const defaultOptions: Options = {
   rssSlug: "index",
   includeEmptyFiles: true,
   rssFilter: () => true,
+  rssLinkParams: "",
 }
 
 function generateSiteMap(cfg: GlobalConfiguration, idx: ContentIndexMap): string {
@@ -54,15 +56,24 @@ function generateSiteMap(cfg: GlobalConfiguration, idx: ContentIndexMap): string
   return `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">${urls}</urlset>`
 }
 
-function generateRSSFeed(cfg: GlobalConfiguration, idx: ContentIndexMap, limit?: number): string {
+function generateRSSFeed(
+  cfg: GlobalConfiguration,
+  idx: ContentIndexMap,
+  limit?: number,
+  linkParams?: string,
+): string {
   const base = cfg.baseUrl ?? ""
+
+  // accept params with or without a leading `?`/`&`
+  const params = linkParams?.replace(/^[?&]+/, "")
+  const query = params ? `?${escapeHTML(params)}` : ""
 
   // a literal `]]>` would close the CDATA section early, so split it across two sections
   const escapeCDATA = (s?: string) => (s ?? "").replaceAll("]]>", "]]]]><![CDATA[>")
 
   const createURLEntry = (slug: SimpleSlug, content: ContentDetails): string => `<item>
     <title>${escapeHTML(content.title)}</title>
-    <link>https://${joinSegments(base, encodeURI(slug))}</link>
+    <link>https://${joinSegments(base, encodeURI(slug))}${query}</link>
     <guid>https://${joinSegments(base, encodeURI(slug))}</guid>
     <description><![CDATA[ ${escapeCDATA(content.richContent ?? content.description)} ]]></description>
     <pubDate>${content.date?.toUTCString()}</pubDate>
@@ -142,7 +153,7 @@ export const ContentIndex: QuartzEmitterPlugin<Partial<Options>> = (opts) => {
       if (opts?.enableRSS) {
         yield write({
           ctx,
-          content: generateRSSFeed(cfg, rssIndex, opts.rssLimit),
+          content: generateRSSFeed(cfg, rssIndex, opts.rssLimit, opts.rssLinkParams),
           slug: (opts?.rssSlug ?? "index") as FullSlug,
           ext: ".xml",
         })

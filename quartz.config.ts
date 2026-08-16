@@ -87,6 +87,7 @@ const config: QuartzConfig = {
         enableRSS: true,
         rssFullHtml: true,
         rssFilter: (data) => data.relativePath?.startsWith("posts/") && data.slug! !== "posts/index" && data.frontmatter?.rss !== false,
+        rssLinkParams: "utm_source=rss&utm_medium=rss&utm_campaign=rss",
       }),
       Plugin.Assets(),
       Plugin.Static(),
