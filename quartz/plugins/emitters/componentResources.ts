@@ -192,6 +192,14 @@ function addGlobalPageResources(ctx: BuildCtx, componentResources: ComponentReso
       cabinScript.defer = true
       document.head.appendChild(cabinScript)
     `)
+  } else if (cfg.analytics?.provider === "fathom") {
+    componentResources.afterDOMLoaded.push(`
+      const fathomScript = document.createElement("script")
+      fathomScript.src = "${cfg.analytics.scriptSrc ?? "https://cdn.usefathom.com/script.js"}"
+      fathomScript.setAttribute("data-site", "${cfg.analytics.siteId}")
+      fathomScript.defer = true
+      document.head.appendChild(fathomScript)
+    `)
   } else if (cfg.analytics?.provider === "clarity") {
     componentResources.afterDOMLoaded.push(`
       const clarityScript = document.createElement("script")

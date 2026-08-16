@@ -12,7 +12,8 @@ const config: QuartzConfig = {
     enableSPA: true,
     enablePopovers: true,
     analytics: {
-      provider: "plausible",
+      provider: "fathom",
+      siteId: "ZSADLGKN",
     },
     locale: "en-US",
     baseUrl: "hypersubject.net",

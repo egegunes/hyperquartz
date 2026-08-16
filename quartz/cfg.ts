@@ -39,6 +39,11 @@ export type Analytics =
       host?: string
     }
   | {
+      provider: "fathom"
+      siteId: string
+      scriptSrc?: string
+    }
+  | {
       provider: "clarity"
       projectId?: string
     }
