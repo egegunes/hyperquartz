@@ -37,7 +37,7 @@ I enjoy listening to others' stories and telling mine. If you have a story to te
 
 You think you don't have a story? I bet you do. But you don't need to tell anything. Just email me to say hi!
 
-You can also find me on Fediverse as [`@ege@social.lol`](https://social.lol/@ege).
+You can also find me on Fediverse as [`ege at social.lol`](https://social.lol/@ege).
 
 ![[./now]]  
 
