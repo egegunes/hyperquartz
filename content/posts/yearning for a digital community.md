@@ -14,12 +14,12 @@ On Friday, I got a message from kerey on WhatsApp saying that "there is a need f
 
 This type of interactions is at the heart of my ideal community. An off-hand remark starts a discussion where we argue and develop the idea and in the end this turns into some kind of writing. Then this writing gets responses from other members in the community in a variety of forms. A community that perpetually creates discourse for discourse's sake.
 
-![[my-ideal-digital-community.png]]
+<img src="https://hypersubject.b-cdn.net/images/yearning-for-a-digital-community/digital-community.png"/>
 
 This is not something that I might just land on. This type of community requires someone to build it from the ground up. "Somebody has to, and no one else will."
 
 Speaking of [[Against the Non-Normie]], I feel a bit uncomfortable about that piece. I believe what I said there but I feel uneasy because of the process I wrote it with. During our conversation, kerey raised the similarity between non-normies and queer community. Since gender studies and queer theory are not my forte, I asked Gemini to make the connection:
-![[2026-02-15-gemini.png]]
+<img src="https://hypersubject.b-cdn.net/images/yearning-for-a-digital-community/gemini.png" />
 
 So I used AI. This might be an acceptable use of AI but I also copied two sentences from its output:
 1. "The 'normal' (heteronormative) subject only exists because it has successfully 'cast out' (abjected) anything that threatens its boundaries."
