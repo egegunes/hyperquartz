@@ -38,6 +38,6 @@ I. LOVE. THIS! I heard about [Crucial Tracks](https://www.crucialtracks.org) tha
 
 This was [my first post](https://www.crucialtracks.org/profile/ege/20260315) there:
 
-%3C%20figure%20width%3D600%20src%3D%22/images/the-global-village/crucialtracks.png%22%20%3E
+<img src="https://hypersubject.b-cdn.net/images/the-global-village/crucialtracks.png" />
 
 You can subscribe to [my feed](https://www.crucialtracks.org/profile/ege/feed) with your favorite RSS reader.

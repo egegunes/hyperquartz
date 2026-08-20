@@ -12,7 +12,7 @@ aliases:
 
 - After 2 weeks of hiatus I was finally in the atelier again to work on my sculpture. I think the bust is coming to an end. I feel the resistance to continue working on it. One part of me says "I'm bored of this, I want to work on something new," while another part says "this is 80% finished and I know the last 20% is the hardest part." I honestly don't know what to do. Anyway this is how it looks right now:
 
-![[C88332ED-2B4D-4853-B408-31016FE2FAA3_1_105_c.jpeg|400]]
+<img src="https://hypersubject.b-cdn.net/images/the-last-20percent/bust.jpeg" width=400 />
 (If you think that it looks odd, it was intentional. It's a bust, half female and half male.)
 
 - We are watching the new Traitors Türkiye show with my wife. It's definitely cringey, but thankfully I've exercised my cringe muscles enough to get hooked on the show. It's so funny to watch a group of people slowly implode because of their failure to coordinate. They keep voting away the innocents because the group keeps selecting tall poppies as the Schelling point. I've never watched the US show so I don't really know the format, but I wish we didn't know the traitors so we could try to spot them alongside the participants. Nevertheless it's a good show to watch while we eat instead of the always depressing Turkish news.

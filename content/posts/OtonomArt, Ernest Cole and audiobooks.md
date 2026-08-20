@@ -13,13 +13,13 @@ aliases:
 I finally did it. I finally found a tutor for sculpting. Actually, what I found is much bigger than just a tutor. I found a workshop, a collective, a mirage in the middle of the desert. Actually... in the middle of an industrial zone.
 
 On Friday I went to [OtonomArt](https://www.otonomart.com/) for an introductory sculpting class. I made this relief with mud:
-![[4BB0044A-EEF6-4D92-A07A-4924B587683D_1_105_c.jpeg|300]]
+<img src="https://hypersubject.b-cdn.net/images/otonomart-ernestcole-audiobooks/relief.jpeg" width=300 />
 
 Starting next week I'll go there twice a week. Finally I have a space for sculpting and hopefully will have a regular practice throughout the year. I am going to enter 2027 as a sculptor.
 
 ## Ernest Cole: Lost and Found
 
-![|300](https://m.media-amazon.com/images/M/MV5BZmY4ZmM0ZjYtMjE3MC00MTlkLTkxZjYtNWJhNDVjNTIwNTQwXkEyXkFqcGc@._V1_FMjpg_UX999_.jpg)
+<img src="https://m.media-amazon.com/images/M/MV5BZmY4ZmM0ZjYtMjE3MC00MTlkLTkxZjYtNWJhNDVjNTIwNTQwXkEyXkFqcGc@._V1_FMjpg_UX999_.jpg" width=300 />
 
 On Saturday we saw [a documentary](https://www.magpictures.com/ernestcole/) about Ernest Cole, a South African photographer who took thousands of photographs exposing the sheer horror of the apartheid regime. The documentary tells the story of 60 thousand negatives mysteriously found in a safe of a Swedish bank. Who put them in this safe, who paid for them all these years is still a mystery. It was not clear to me if this was a conspiracy to hide those photos from public or simply an act of goodwill to protect Cole's legacy. The documentary is somewhat ambiguous about this.
 

@@ -13,7 +13,7 @@ I have a great respect for Scott and Zvi. Their rationality and ability to deduc
 
 Analyzing the "vibecession" —or the Great Vibepression—through the lens of empirical data presents a problem: data is necessarily historical, while the vibecession is about the future. The future is, by definition, uncharted and unquantifiable. One can only sense the future, and what we sense is impending doom.
 
-societal-collapse.jpeg
+<img src="https://hypersubject.b-cdn.net/images/the-great-vibepression/cover.jpeg" />
 
 I think it's uncharitable to see "high" expectations of younger generations as the main reason of the vibepression. High relative to what? And high for whom? Older generations and the majority of participants of vibepression discourse had time. They had chance to show up, do their work, save money and slowly accumulate wealth. They had that kind of deal with the system. [That deal is dead.](https://x.com/systematicls/status/2004900241745883205/) Do I really have time on my hands? Considering the hyperobjects of our time, I need safety. Safety requires money. I can not defer this requirement to future. I am deeply uncertain about what future will bring. 
 

@@ -11,11 +11,11 @@ A while ago, during a sprint retrospective, I suggested significant changes to o
 
 The silence lasted nearly a minute. Why was no one saying anything? Finally, the PM broke the tension by prompting the team:
 
-![[champion of passivity.png]]
+<img src="https://hypersubject.b-cdn.net/images/the-designated-rebel/meeting-0.png" />
 
 His comment further irritated me. I wondered: _Are we really going to operate like this, where I suggest a top-down change and everyone silently accepts the new rules?_ So, I protested.
 
-![[champion of passivity-1.png]]
+<img src="https://hypersubject.b-cdn.net/images/the-designated-rebel/meeting-1.png" />
 
 After the meeting, I couldn't stop reflecting on it. A quote from Žižek began racing through my mind: "_Those in power often prefer even a critical participation to silence._" I told myself I spoke up to allow people to be active participants in decisions affecting their day-to-day lives. But then I had to ask: Did I say what I said because I was in a position of power?
 
