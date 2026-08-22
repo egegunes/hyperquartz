@@ -13,7 +13,6 @@ title: "Now"
 - **September**: 
 	- Bremen, Germany
 	- Amsterdam, Netherlands (Percona Live)
-	- Lisbon, Portugal
 - **November**:
 	- New York, USA
 	- Utah, USA (KubeCon)
