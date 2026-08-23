@@ -8,7 +8,7 @@ title: "Now"
 - **Blogging**: I publish at least one blog post every week on [hypersubject.net](https://hypersubject.net/) but lately I've started publishing more frequently.
 #### Reading
 - *American Trickster: The Hidden Lives of Carlos Castaneda* by Ru Marshall (e-book) (in English)
-- *The Claw of the Conciliator* by Gene Wolfe (e-book) (in English)
+- *The Gramsci Book: Selected Writings 1916-1935*
 #### Travel plans
 - **September**: 
 	- Bremen, Germany
