@@ -15,7 +15,7 @@ const recentNotes = [
 export const sharedPageComponents: SharedLayout = {
   head: Component.Head(),
   header: [],
-  afterBody: [...recentNotes.map((c) => Component.MobileOnly(c))],
+  afterBody: [Component.Webmentions(), ...recentNotes.map((c) => Component.MobileOnly(c))],
   footer: Component.Footer({
     links: {
       RSS: "/index.xml"

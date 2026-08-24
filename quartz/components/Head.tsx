@@ -80,6 +80,9 @@ export default (() => {
             <meta property="twitter:domain" content={cfg.baseUrl}></meta>
             <meta property="og:url" content={socialUrl}></meta>
             <meta property="twitter:url" content={socialUrl}></meta>
+            <link rel="webmention" href={`https://webmention.io/${cfg.baseUrl}/webmention`} />
+            <link rel="pingback" href={`https://webmention.io/${cfg.baseUrl}/xmlrpc`} />
+            <link rel="me" href="mailto:ege@hypersubject.net" />
           </>
         )}
 
