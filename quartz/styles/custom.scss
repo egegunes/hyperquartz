@@ -616,3 +616,14 @@ pre > code mark[data-chars-id] {
     margin: 0px 1em 0px 0px;
     min-width: max-content;
 }
+
+// "Reply to this post via email" link appended to every post by the
+// EmailReply transformer (also present in RSS items, where this style
+// obviously doesn't apply).
+p.reply-via-email {
+  margin-top: 2rem;
+
+  a {
+    color: var(--gray);
+  }
+}

@@ -75,6 +75,10 @@ const config: QuartzConfig = {
       Plugin.CrawlLinks({ markdownLinkResolution: "relative", lazyLoad: true }),
       Plugin.Description(),
       Plugin.Latex({ renderEngine: "katex" }),
+      Plugin.EmailReply({
+        address: "ege@hypersubject.net",
+        linkText: "Reply to this post via email",
+      }),
     ],
     filters: [Plugin.RemoveDrafts()],
     emitters: [
