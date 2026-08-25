@@ -52,5 +52,20 @@
     margin: 0.25rem 0 0 0;
     font-size: 0.95rem;
     overflow-wrap: anywhere;
+
+    p {
+      margin: 0 0 0.5rem 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    blockquote {
+      margin: 0.5rem 0;
+      padding-left: 0.75rem;
+      border-left: 3px solid var(--lightgray);
+      color: var(--gray);
+    }
   }
 }

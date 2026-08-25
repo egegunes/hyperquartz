@@ -24,13 +24,69 @@ const safeUrl = (u?: string): string | null => {
   }
 }
 
+// strict allowlist sanitizer for mention html: only these tags survive, unknown
+// tags are unwrapped to their children, and no attributes are copied except a
+// validated href on links
+const ALLOWED_TAGS = new Set([
+  "p",
+  "blockquote",
+  "a",
+  "em",
+  "i",
+  "strong",
+  "b",
+  "code",
+  "pre",
+  "br",
+  "ul",
+  "ol",
+  "li",
+])
+
+// dropped wholesale, children included, so e.g. script/style text never leaks
+const DROPPED_TAGS = new Set(["script", "style", "template", "iframe", "object", "embed"])
+
+const sanitizeNode = (node: Node): Node[] => {
+  if (node.nodeType === Node.TEXT_NODE) {
+    return [document.createTextNode(node.textContent ?? "")]
+  }
+  if (node.nodeType !== Node.ELEMENT_NODE) return []
+  const el = node as Element
+  const tag = el.tagName.toLowerCase()
+  if (DROPPED_TAGS.has(tag)) return []
+  const children = [...el.childNodes].flatMap(sanitizeNode)
+  if (!ALLOWED_TAGS.has(tag)) return children
+  const clean = document.createElement(tag)
+  if (tag === "a") {
+    const href = safeUrl(el.getAttribute("href") ?? undefined)
+    if (href) {
+      clean.setAttribute("href", href)
+      clean.setAttribute("rel", "nofollow noopener")
+    }
+  }
+  clean.append(...children)
+  return [clean]
+}
+
+const sanitizeHtml = (html: string): DocumentFragment => {
+  // DOMParser never executes scripts; rebuilding fresh elements from the
+  // allowlist drops event handlers and every other attribute
+  const doc = new DOMParser().parseFromString(html, "text/html")
+  const frag = document.createDocumentFragment()
+  frag.append(...[...doc.body.childNodes].flatMap(sanitizeNode))
+  return frag
+}
+
 const fetchMentions = async (target: string): Promise<WMEntry[]> => {
-  const variants = new Set([
+  // mentions sent from feed readers target the rssLinkParams-decorated url
+  const rssParams = "?utm_source=rss&utm_medium=rss&utm_campaign=rss"
+  const bases = [
     target,
     target + "/",
     target.replace(/^https:/, "http:"),
     target.replace(/^https:/, "http:") + "/",
-  ])
+  ]
+  const variants = new Set(bases.flatMap((t) => [t, t + rssParams]))
   const params = [...variants].map((t) => `target[]=${encodeURIComponent(t)}`).join("&")
   const res = await fetch(
     `https://webmention.io/api/mentions.jf2?per-page=100&sort-by=published&sort-dir=up&${params}`,
@@ -85,6 +141,17 @@ const renderMention = (entry: WMEntry): HTMLLIElement => {
     meta.appendChild(span)
   }
 
+  const verbs: Record<string, string> = {
+    "in-reply-to": "replied",
+    "mention-of": "mentioned this",
+    "bookmark-of": "bookmarked this",
+    rsvp: "RSVPed",
+  }
+  const verb = verbs[entry["wm-property"] ?? ""]
+  if (verb) {
+    meta.appendChild(document.createTextNode(` ${verb}`))
+  }
+
   const date = formatDate(entry)
   if (sourceUrl || date) {
     const a = document.createElement(sourceUrl ? "a" : "span") as HTMLElement
@@ -100,8 +167,14 @@ const renderMention = (entry: WMEntry): HTMLLIElement => {
 
   body.appendChild(meta)
 
+  const html = entry.content?.html?.trim()
   const text = entry.content?.text?.trim()
-  if (text) {
+  if (html) {
+    const div = document.createElement("div")
+    div.className = "webmention-content"
+    div.appendChild(sanitizeHtml(html))
+    body.appendChild(div)
+  } else if (text) {
     const p = document.createElement("p")
     p.className = "webmention-content"
     p.textContent = text.length > 400 ? text.slice(0, 400).trimEnd() + "…" : text
@@ -131,9 +204,8 @@ document.addEventListener("nav", async () => {
 
   const likes = entries.filter((e) => e["wm-property"] === "like-of").length
   const reposts = entries.filter((e) => e["wm-property"] === "repost-of").length
-  const bookmarks = entries.filter((e) => e["wm-property"] === "bookmark-of").length
   const mentions = entries.filter((e) =>
-    ["in-reply-to", "mention-of", "rsvp"].includes(e["wm-property"] ?? ""),
+    ["in-reply-to", "mention-of", "bookmark-of", "rsvp"].includes(e["wm-property"] ?? ""),
   )
 
   const counts = container.querySelector<HTMLElement>(".webmention-counts")
@@ -141,7 +213,6 @@ document.addEventListener("nav", async () => {
     const parts = []
     if (likes > 0) parts.push(pluralize(likes, "like"))
     if (reposts > 0) parts.push(pluralize(reposts, "repost"))
-    if (bookmarks > 0) parts.push(pluralize(bookmarks, "bookmark"))
     counts.textContent = parts.join(" · ")
     counts.hidden = parts.length === 0
   }
