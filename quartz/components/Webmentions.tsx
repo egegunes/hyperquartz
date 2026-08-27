@@ -15,8 +15,7 @@ export default (() => {
     return (
       <section class={classNames(displayClass, "webmentions")} data-target={target} hidden>
         <h3>Webmentions</h3>
-        <p class="webmention-counts"></p>
-        <ul class="webmention-list"></ul>
+        <ul class="webmention-list" hidden></ul>
       </section>
     )
   }

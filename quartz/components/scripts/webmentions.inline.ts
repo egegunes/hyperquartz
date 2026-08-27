@@ -104,12 +104,37 @@ const formatDate = (entry: WMEntry): string | null => {
   return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
 }
 
+const VERBS: Record<string, string> = {
+  "in-reply-to": "replied",
+  "mention-of": "mentioned this",
+  "bookmark-of": "bookmarked this",
+  rsvp: "RSVPed",
+  "like-of": "liked this",
+  "repost-of": "reposted this",
+}
+
+// likes and reposts list as a bare "<name> liked this · <date>" line:
+// no avatar, and no body (see renderMention)
+const REACTIONS = new Set(["like-of", "repost-of"])
+const isReaction = (entry: WMEntry): boolean => REACTIONS.has(entry["wm-property"] ?? "")
+
+// the same like can arrive more than once: bridgy re-sends, and the http/https
+// and rss-param target variants we ask for all land in one response
+const dedupe = (entries: WMEntry[]): WMEntry[] => {
+  const seen = new Map<string, WMEntry>()
+  for (const [i, entry] of entries.entries()) {
+    const author = safeUrl(entry.author?.url) ?? entry.author?.name?.trim() ?? entry.url
+    seen.set(`${entry["wm-property"]}\u0000${author ?? `anon-${i}`}`, entry)
+  }
+  return [...seen.values()]
+}
+
 const renderMention = (entry: WMEntry): HTMLLIElement => {
   const li = document.createElement("li")
   li.className = "webmention"
 
   const authorUrl = safeUrl(entry.author?.url)
-  const photoUrl = safeUrl(entry.author?.photo)
+  const photoUrl = isReaction(entry) ? null : safeUrl(entry.author?.photo)
   const sourceUrl = safeUrl(entry.url)
 
   if (photoUrl) {
@@ -141,13 +166,7 @@ const renderMention = (entry: WMEntry): HTMLLIElement => {
     meta.appendChild(span)
   }
 
-  const verbs: Record<string, string> = {
-    "in-reply-to": "replied",
-    "mention-of": "mentioned this",
-    "bookmark-of": "bookmarked this",
-    rsvp: "RSVPed",
-  }
-  const verb = verbs[entry["wm-property"] ?? ""]
+  const verb = VERBS[entry["wm-property"] ?? ""]
   if (verb) {
     meta.appendChild(document.createTextNode(` ${verb}`))
   }
@@ -167,8 +186,10 @@ const renderMention = (entry: WMEntry): HTMLLIElement => {
 
   body.appendChild(meta)
 
-  const html = entry.content?.html?.trim()
-  const text = entry.content?.text?.trim()
+  // webmention.io synthesises content for a reaction ("X liked <post title>"),
+  // which only restates the meta line above, so drop it
+  const html = isReaction(entry) ? undefined : entry.content?.html?.trim()
+  const text = isReaction(entry) ? undefined : entry.content?.text?.trim()
   if (html) {
     const div = document.createElement("div")
     div.className = "webmention-content"
@@ -185,8 +206,6 @@ const renderMention = (entry: WMEntry): HTMLLIElement => {
   return li
 }
 
-const pluralize = (n: number, word: string): string => `${n} ${word}${n === 1 ? "" : "s"}`
-
 document.addEventListener("nav", async () => {
   const container = document.querySelector<HTMLElement>("section.webmentions")
   if (!container || !container.dataset.target) return
@@ -202,20 +221,11 @@ document.addEventListener("nav", async () => {
   if (!container.isConnected) return
   if (entries.length === 0) return
 
-  const likes = entries.filter((e) => e["wm-property"] === "like-of").length
-  const reposts = entries.filter((e) => e["wm-property"] === "repost-of").length
-  const mentions = entries.filter((e) =>
-    ["in-reply-to", "mention-of", "bookmark-of", "rsvp"].includes(e["wm-property"] ?? ""),
-  )
-
-  const counts = container.querySelector<HTMLElement>(".webmention-counts")
-  if (counts) {
-    const parts = []
-    if (likes > 0) parts.push(pluralize(likes, "like"))
-    if (reposts > 0) parts.push(pluralize(reposts, "repost"))
-    counts.textContent = parts.join(" · ")
-    counts.hidden = parts.length === 0
-  }
+  // reactions first: one-liners are cheap to scan before the quoted responses
+  const mentions = [
+    ...dedupe(entries.filter(isReaction)),
+    ...entries.filter((e) => !isReaction(e) && VERBS[e["wm-property"] ?? ""] !== undefined),
+  ]
 
   const list = container.querySelector<HTMLElement>(".webmention-list")
   if (list) {
