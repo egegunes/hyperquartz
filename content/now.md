@@ -22,8 +22,8 @@ title: "Now"
 
 #### Listening to
 
-Roseland NYC Live (1998) by Portished  
+Roseland NYC Live (1998) by Portishead  
 
 <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02ebc6455b3ba773abc40119c0" />
 
-Last updated: 2026-08-29
+Last updated: 2026-08-30
