@@ -6,9 +6,11 @@ title: "Now"
 #### Doing
 - **Sculpting**: I'm spending 5-6 hours every week making sculptures from clay. I just finished modelling my second one.
 - **Blogging**: I publish at least one blog post every week on [hypersubject.net](https://hypersubject.net/) but lately I've started publishing more frequently.
+
 #### Reading
 - *American Trickster: The Hidden Lives of Carlos Castaneda* by Ru Marshall (e-book) (in English)
-- *The Gramsci Book: Selected Writings 1916-1935*
+- *Hypercapitalism* by Larry Gonick & Tim Kasser (in Turkish)
+
 #### Travel plans
 - **September**: 
 	- Bremen, Germany
@@ -17,10 +19,11 @@ title: "Now"
 	- New York, USA
 	- Utah, USA (KubeCon)
 	- São Paulo, Brazil
+
 #### Listening to
 
-Led Zeppelin (1969) by Led Zeppelin  
+Roseland NYC Live (1998) by Portished  
 
-<img src="https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02c77c73285cc5cb64d97e1b0f" />
+<img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02ebc6455b3ba773abc40119c0" />
 
-Last updated: 2026-08-16
+Last updated: 2026-08-29
