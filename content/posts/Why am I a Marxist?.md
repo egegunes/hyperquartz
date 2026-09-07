@@ -16,3 +16,4 @@ Let's start with what you should not understand. I **don't** think:
 - only driving force in history was class struggle and nothing else.
 
 First and foremost, I'm a Marxist because I agree with Marx's critique of capitalist economy. I believe it's fundamentally wrong to arrange the economy in terms of maximizing profits. I believe the economy should be for satisfying human needs.
+
