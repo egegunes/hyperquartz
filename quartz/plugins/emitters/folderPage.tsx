@@ -89,6 +89,12 @@ function computeFolderInfo(
   return folderInfo
 }
 
+// folder listings can render the full contents of the pages they list, so keep
+// each page's rendered html around alongside its frontmatter
+function withHtmlAst(content: ProcessedContent[]): QuartzPluginData[] {
+  return content.map(([tree, file]) => ({ ...file.data, htmlAst: tree }))
+}
+
 function _getFolders(slug: FullSlug): SimpleSlug[] {
   var folderName = path.dirname(slug ?? "") as SimpleSlug
   const parentFolderNames = [folderName]
@@ -129,7 +135,7 @@ export const FolderPage: QuartzEmitterPlugin<Partial<FolderPageOptions>> = (user
       ]
     },
     async *emit(ctx, content, resources) {
-      const allFiles = content.map((c) => c[1].data)
+      const allFiles = withHtmlAst(content)
       const cfg = ctx.cfg.configuration
 
       const folders: Set<SimpleSlug> = new Set(
@@ -146,7 +152,7 @@ export const FolderPage: QuartzEmitterPlugin<Partial<FolderPageOptions>> = (user
       yield* processFolderInfo(ctx, folderInfo, allFiles, opts, resources)
     },
     async *partialEmit(ctx, content, resources, changeEvents) {
-      const allFiles = content.map((c) => c[1].data)
+      const allFiles = withHtmlAst(content)
       const cfg = ctx.cfg.configuration
 
       // Find all folders that need to be updated based on changed files

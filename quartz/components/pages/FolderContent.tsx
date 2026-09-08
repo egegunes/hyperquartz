@@ -1,7 +1,8 @@
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "../types"
 
 import style from "../styles/listPage.scss"
-import { PageList, SortFn } from "../PageList"
+import { PageList, SortFn, byDateAndAlphabetical } from "../PageList"
+import { PageContentList } from "../PageContentList"
 import { Root } from "hast"
 import { htmlToJsx } from "../../util/jsx"
 import { i18n } from "../../i18n"
@@ -16,12 +17,18 @@ interface FolderContentOptions {
    */
   showFolderCount: boolean
   showSubfolders: boolean
+  /**
+   * Render each page's full contents instead of a list of links.
+   * Can also be enabled per folder with `folder-view: full` in the folder index frontmatter.
+   */
+  fullContent: boolean
   sort?: SortFn
 }
 
 const defaultOptions: FolderContentOptions = {
   showFolderCount: true,
   showSubfolders: true,
+  fullContent: false,
 }
 
 export default ((opts?: Partial<FolderContentOptions>) => {
@@ -88,11 +95,14 @@ export default ((opts?: Partial<FolderContentOptions>) => {
           }
         })
         .filter((page) => page !== undefined) ?? []
+    const fullContent =
+      options.fullContent || fileData.frontmatter?.["folder-view"] === "full"
+
     const cssClasses: string[] = fileData.frontmatter?.cssclasses ?? []
     const classes = cssClasses.join(" ")
     const listProps = {
       ...props,
-      sort: options.sort,
+      sort: options.sort ?? (fullContent ? byDateAndAlphabetical(cfg) : undefined),
       allFiles: allPagesInFolder,
     }
 
@@ -106,7 +116,7 @@ export default ((opts?: Partial<FolderContentOptions>) => {
       <div class="popover-hint">
         <article class={classes}>{content}</article>
         <div class="page-listing">
-          {options.showFolderCount && (
+          {options.showFolderCount && !fullContent && (
             <p>
               {i18n(cfg.locale).pages.folderContent.itemsUnderFolder({
                 count: allPagesInFolder.length,
@@ -114,13 +124,13 @@ export default ((opts?: Partial<FolderContentOptions>) => {
             </p>
           )}
           <div>
-            <PageList {...listProps} />
+            {fullContent ? <PageContentList {...listProps} /> : <PageList {...listProps} />}
           </div>
         </div>
       </div>
     )
   }
 
-  FolderContent.css = concatenateResources(style, PageList.css)
+  FolderContent.css = concatenateResources(style, PageList.css, PageContentList.css)
   return FolderContent
 }) satisfies QuartzComponentConstructor

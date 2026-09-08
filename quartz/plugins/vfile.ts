@@ -12,3 +12,11 @@ export function defaultProcessedContent(vfileData: Partial<QuartzPluginData>): P
   vfile.data = vfileData
   return [root, vfile]
 }
+
+declare module "vfile" {
+  interface DataMap {
+    // set by emitters that need to render another page's rendered content inline
+    // (e.g. full-content folder listings)
+    htmlAst: HtmlRoot
+  }
+}

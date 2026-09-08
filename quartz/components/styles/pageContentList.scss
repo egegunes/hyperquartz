@@ -1,0 +1,36 @@
+ul.content-list {
+  list-style: none;
+  margin-top: 2em;
+  padding-left: 0;
+}
+
+li.content-list-item {
+  margin-bottom: 2em;
+  padding-bottom: 2em;
+  border-bottom: 1px solid var(--lightgray);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  & .meta {
+    margin: 0;
+    opacity: 0.6;
+
+    & > a.permalink {
+      background-color: transparent;
+    }
+  }
+
+  & .content-list-body > :first-child {
+    margin-top: 0.5em;
+  }
+
+  & .content-list-body > :last-child {
+    margin-bottom: 0;
+  }
+
+  & > article > .tags {
+    margin: 0.5em 0 0 0;
+  }
+}
