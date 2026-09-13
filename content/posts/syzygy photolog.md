@@ -3,8 +3,9 @@ note-type: blog
 title: syzygy photolog
 date: 2026-05-17
 tags:
-  - sculpting
   - weekly-update
+  - photolog
+  - art
 aliases:
   - /entries/2026/05/syzygy-photolog
   - /entries/2026/05/syzygy-photolog/index

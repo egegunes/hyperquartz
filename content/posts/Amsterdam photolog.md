@@ -4,6 +4,7 @@ title: Amsterdam photolog
 date: 2026-03-29
 tags:
   - weekly-update
+  - photolog
 aliases:
   - /entries/2026/03/amsterdam-photolog
   - /entries/2026/03/amsterdam-photolog/index
