@@ -21,4 +21,4 @@ Motherfucker...
 
 Since I was there for work, I couldn't afford a political conflict—especially about Israel. But I couldn't believe he had the audacity to say such a thing. I wonder how he would feel if he heard a German in the 1940s saying something like this while thousands of Jews were being slaughtered every minute. I doubt he would be smirking like that.
 
-[^1]: A lot of Turks would be very angry with me for saying this. I have a much laxer definition of genocide than many: Armenians had been living in Anatolia for centuries and had deep roots here. Even if we didn't really try to systematically exterminate the race, we forcefully removed them from their land. This is, by my definition, a genocide.[↩︎](#fnref-1)
+[^1]: A lot of Turks would be very angry with me for saying this. I have a much laxer definition of genocide than many: Armenians had been living in Anatolia for centuries and had deep roots here. Even if we didn't really try to systematically exterminate the race, we forcefully removed them from their land. This is, by my definition, a genocide.
