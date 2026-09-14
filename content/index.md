@@ -12,7 +12,7 @@ If you wish to add my blog to your RSS feed, [here's the link](/index.xml).
 
 ### About me
 
-<img src="https://hyperimages.net/photos/70/photo-0.jpeg" width="300">
+<img src="https://hyperimages.b-cdn.net/photos/70/photo-0-960.jpg" width="300">
 
 This is how I look as of February 2026.
 
