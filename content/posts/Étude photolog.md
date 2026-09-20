@@ -1,6 +1,6 @@
 ---
 note-type: blog
-title: etude photolog
+title: Étude photolog
 date: 2026-09-20
 tags:
   - weekly-update
