@@ -8,7 +8,8 @@ title: "Now"
 - **Blogging**: I publish at least one blog post every week on [hypersubject.net](https://hypersubject.net/) but lately I've started publishing more frequently.
 
 #### Reading
-- *American Trickster: The Hidden Lives of Carlos Castaneda* by Ru Marshall (e-book) (in English)
+- *American Trickster: The Hidden Lives of Carlos Castaneda* by Ru Marshall 
+* *After the Future* by Franco "Bifo" Berardi
 
 #### Travel plans
 - **November 2026**:
@@ -19,8 +20,8 @@ title: "Now"
 
 #### Listening to
 
-Roseland NYC Live (1998) by Portishead  
+Kostolom (2019) by Slaughter to Prevail  
 
-<img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02ebc6455b3ba773abc40119c0" />
+<img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02e092c78e40e11120693ee3d1" />
 
-Last updated: 2026-09-26
+Last updated: 2026-09-27
