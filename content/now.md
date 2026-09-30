@@ -20,8 +20,8 @@ title: "Now"
 
 #### Listening to
 
-Kostolom (2019) by Slaughter to Prevail  
+Canciones de la Guerra Civil Española (1967) by Rolando Alarcon
 
-<img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02e092c78e40e11120693ee3d1" />
+<img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e020b646f3cb8f0a51b4cca4966" />
 
-Last updated: 2026-09-27
+Last updated: 2026-09-30
