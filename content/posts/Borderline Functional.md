@@ -30,7 +30,7 @@ I met with [Derek Sivers](https://sive.rs) in İstanbul and we had a lovely chat
 We watched a play by one of our comrades. The play was based on Edgar Allan Poe's short story The Tell-Tale Heart, in which a man is pushed to commit murder by an old man's vulture-like pale blue eye. The narrator, the alleged murderer, is unreliable, so you never really know whether he actually committed the crime or is just describing his fantasy of killing his own father.
 
 <figure>
-<img src="https://hypersubject.b-cdn.net/images/2026-11-10-weekly-update/IMG_0626.jpeg" height=600 />
+<img src="https://hypersubject.b-cdn.net/images/2026-11-10-weekly-update/IMG_0626.jpeg" />
 </figure>
 
 ***
