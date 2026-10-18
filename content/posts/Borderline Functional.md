@@ -40,7 +40,7 @@ This week I took the new turntable for a spin and started working on a small scu
 I decided to sculpt a reclining female nude, a homage to a Lovis Corinth painting that I saw in the [[./bremen kunsthalle|Kunsthalle Bremen]]. I spent hours working on the armature and then the gesture.
 
 <figure>
-<img src="https://hypersubject.b-cdn.net/images/2026-11-10-weekly-update/IMG_0628.jpeg" height=600 />
+<img src="https://hypersubject.b-cdn.net/images/2026-11-10-weekly-update/IMG_0628.jpeg" />
 <figcaption>Armature</figcaption>
 </figure>
 
