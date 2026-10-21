@@ -7,7 +7,7 @@ draft: false
 ---
 A few days ago I saw a post on Instagram about a simple test to figure out how you actually feel about someone: "two beers and a puppy" test.
 
-It's invented by Ross McCammon in his book *Works Well with Others* (the book also has a ridiculously long subtitle).
+It was invented by Ross McCammon in his book, which has a ridiculously long subtitle: _Works Well with Others: An Outsider’s Guide to Shaking Hands, Shutting Up, Handling Jerks, and Other Crucial Skills in Business That No One Ever Teaches You_.
 
 > Two Beers and and a puppy” is a test I developed while working on the _Esquire_ story on the American “son of a bitch.” The test is: In order to find out how you actually feel about someone, ask yourself: “Would I have two beers with this person?” And: “Would I allow this person to look after my puppy over a weekend?”
 > 
