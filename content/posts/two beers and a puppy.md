@@ -5,7 +5,7 @@ date: 2026-10-21T23:10:00+03:00
 tags:
 draft: false
 ---
-A few days ago I saw a post on Instagram about a simple test to figure out how you actually feel about someone: "two beers and a puppy" test.
+A few days ago I saw a post on Instagram about a simple test to figure out how you actually feel about someone: the "two beers and a puppy" test.
 
 It was invented by Ross McCammon in his book, which has a ridiculously long subtitle: _Works Well with Others: An Outsider’s Guide to Shaking Hands, Shutting Up, Handling Jerks, and Other Crucial Skills in Business That No One Ever Teaches You_.
 
