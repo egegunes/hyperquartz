@@ -94,6 +94,7 @@ const config: QuartzConfig = {
         rssLinkParams: "utm_source=rss&utm_medium=rss&utm_campaign=rss",
       }),
       Plugin.Assets(),
+      Plugin.RawHtmlPage(),
       Plugin.Static(),
       Plugin.Favicon(),
       Plugin.NotFoundPage(),
