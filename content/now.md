@@ -8,8 +8,7 @@ title: "Now"
 - **Blogging**: I publish at least one blog post every week on [hypersubject.net](https://hypersubject.net/) but lately I've started publishing more frequently.
 
 #### Reading
-- *American Trickster: The Hidden Lives of Carlos Castaneda* by Ru Marshall 
-* *After the Future* by Franco "Bifo" Berardi
+- *We* by Yevgeny Zamyetin
 
 #### Travel plans
 - **November 2026**:
