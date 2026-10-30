@@ -4,7 +4,7 @@ title: I’ve walked these streets before
 date: 2026-10-30T06:10:55-04:00
 tags:
   - travel
-draft: false
+draft: true
 ---
 Last week was so busy that I skipped writing a weekly update here. I figured it'd be better if I write an ad-hoc update[^1].
 
