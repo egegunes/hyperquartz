@@ -1,5 +1,6 @@
 import { QuartzConfig } from "./quartz/cfg"
 import * as Plugin from "./quartz/plugins"
+import * as Component from "./quartz/components"
 
 /**
  * Quartz 4 Configuration
@@ -84,13 +85,13 @@ const config: QuartzConfig = {
     emitters: [
       Plugin.ComponentResources(),
       Plugin.ContentPage(),
-      Plugin.FolderPage(),
+      Plugin.FolderPage({ pageBody: Component.FolderContent({ showSubfolders: false }) }),
       Plugin.TagPage(),
       Plugin.ContentIndex({
         enableSiteMap: true,
         enableRSS: true,
         rssFullHtml: true,
-        rssFilter: (data) => ((data.relativePath?.startsWith("posts/") && data.slug! !== "posts/index") || (data.relativePath?.startsWith("beats/") && data.slug! !== "beats/index")) && data.frontmatter?.rss !== false,
+        rssFilter: (data) => ((data.relativePath?.startsWith("posts/") && data.slug! !== "posts/index" && !data.slug!.startsWith("posts/redactions/")) || (data.relativePath?.startsWith("beats/") && data.slug! !== "beats/index")) && data.frontmatter?.rss !== false,
         rssLinkParams: "utm_source=rss&utm_medium=rss&utm_campaign=rss",
       }),
       Plugin.Assets(),
