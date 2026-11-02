@@ -14,7 +14,7 @@ export const EmailReply: QuartzTransformerPlugin<Options> = (opts) => ({
         if (!opts?.address) return
         if (!file.data.relativePath?.startsWith("posts/")) return
         if (file.data.slug === "posts/index") return
-        if (file.data.slug?.startsWith("posts/redactions/")) return
+        if (file.data.slug?.startsWith("posts/ai-edits/")) return
 
         const title = file.data.frontmatter?.title
         if (!title) return

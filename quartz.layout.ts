@@ -9,7 +9,7 @@ const recentNotes = [
     filter: (f) =>
       f.slug!.startsWith("posts/") &&
       f.slug! !== "posts/index" &&
-      !f.slug!.startsWith("posts/redactions/"),
+      !f.slug!.startsWith("posts/ai-edits/"),
     linkToMore: "posts/" as SimpleSlug,
   }),
 ]
