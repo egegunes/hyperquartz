@@ -7,7 +7,11 @@ import script from "./scripts/webmentions.inline"
 export default (() => {
   const Webmentions: QuartzComponent = ({ displayClass, fileData, cfg }: QuartzComponentProps) => {
     const slug = fileData.slug ?? ""
-    if (!slug.startsWith("posts/") || slug === "posts/index") {
+    if (
+      !slug.startsWith("posts/") ||
+      slug === "posts/index" ||
+      slug.startsWith("posts/ai-edits/")
+    ) {
       return null
     }
 

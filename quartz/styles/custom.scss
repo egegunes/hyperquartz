@@ -627,3 +627,18 @@ p.reply-via-email {
     color: var(--gray);
   }
 }
+
+// Link to a post's AI edits page, appended by the AIEditsLink
+// transformer (before EmailReply) when posts/ai-edits/<same name>.md exists.
+p.ai-edits-link {
+  margin-top: 2rem;
+
+  & + p.reply-via-email {
+    margin-top: 0;
+  }
+
+  a {
+    color: var(--gray);
+    text-decoration: none;
+  }
+}

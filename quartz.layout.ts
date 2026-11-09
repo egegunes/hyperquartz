@@ -6,7 +6,10 @@ const recentNotes = [
   Component.RecentNotes({
     title: "Recent Posts",
     limit: 5,
-    filter: (f) => f.slug!.startsWith("posts/") && f.slug! !== "posts/index",
+    filter: (f) =>
+      f.slug!.startsWith("posts/") &&
+      f.slug! !== "posts/index" &&
+      !f.slug!.startsWith("posts/ai-edits/"),
     linkToMore: "posts/" as SimpleSlug,
   }),
 ]

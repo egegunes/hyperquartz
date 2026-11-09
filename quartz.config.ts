@@ -1,5 +1,6 @@
 import { QuartzConfig } from "./quartz/cfg"
 import * as Plugin from "./quartz/plugins"
+import * as Component from "./quartz/components"
 
 /**
  * Quartz 4 Configuration
@@ -75,6 +76,7 @@ const config: QuartzConfig = {
       Plugin.CrawlLinks({ markdownLinkResolution: "relative", lazyLoad: true }),
       Plugin.Description(),
       Plugin.Latex({ renderEngine: "katex" }),
+      Plugin.AIEditsLink({ linkText: "Proofread with AI · see edits" }),
       Plugin.EmailReply({
         address: "ege@hypersubject.net",
         linkText: "Reply to this post via email",
@@ -84,13 +86,13 @@ const config: QuartzConfig = {
     emitters: [
       Plugin.ComponentResources(),
       Plugin.ContentPage(),
-      Plugin.FolderPage(),
+      Plugin.FolderPage({ pageBody: Component.FolderContent({ showSubfolders: false }) }),
       Plugin.TagPage(),
       Plugin.ContentIndex({
         enableSiteMap: true,
         enableRSS: true,
         rssFullHtml: true,
-        rssFilter: (data) => ((data.relativePath?.startsWith("posts/") && data.slug! !== "posts/index") || (data.relativePath?.startsWith("beats/") && data.slug! !== "beats/index")) && data.frontmatter?.rss !== false,
+        rssFilter: (data) => ((data.relativePath?.startsWith("posts/") && data.slug! !== "posts/index" && !data.slug!.startsWith("posts/ai-edits/")) || (data.relativePath?.startsWith("beats/") && data.slug! !== "beats/index")) && data.frontmatter?.rss !== false,
         rssLinkParams: "utm_source=rss&utm_medium=rss&utm_campaign=rss",
       }),
       Plugin.Assets(),
