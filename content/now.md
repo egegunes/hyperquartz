@@ -8,19 +8,18 @@ title: "Now"
 - **Blogging**: I publish at least one blog post every week on [hypersubject.net](https://hypersubject.net/) but lately I've started publishing more frequently.
 
 #### Reading
-- *We* by Yevgeny Zamyetin
+Nothing at the moment.
 
 #### Travel plans
 - **November 2026**:
-	- New York, USA
 	- Utah, USA (KubeCon)
 - **February 2027**:
 	- Brussels, Belgium (FOSDEM)
 
 #### Listening to
 
-Canciones de la Guerra Civil Española (1967) by Rolando Alarcon
+Illmatic (1994) by Nas
 
-<img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e020b646f3cb8f0a51b4cca4966" />
+<img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e0271d840defb002ed3b180f7cd" />
 
-Last updated: 2026-09-30
+Last updated: 2026-11-08
