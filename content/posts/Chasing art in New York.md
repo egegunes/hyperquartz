@@ -4,6 +4,7 @@ title: Chasing art in New York
 date: 2026-11-08T20:45:03-07:00
 tags:
   - art
+  - travel
 draft: false
 ---
 New York City offers whatever you want, quickly and without much fuss. You just gotta walk the walk. I was excited to see the art in the city's museums. So I walked the walk, between museums.
