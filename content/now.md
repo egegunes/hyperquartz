@@ -8,11 +8,9 @@ title: "Now"
 - **Blogging**: I publish at least one blog post every week on [hypersubject.net](https://hypersubject.net/) but lately I've started publishing more frequently.
 
 #### Reading
-Nothing at the moment.
+- _A Young Doctor's Notebook_ by Mikhail Bulgakov
 
 #### Travel plans
-- **November 2026**:
-	- Utah, USA (KubeCon)
 - **February 2027**:
 	- Brussels, Belgium (FOSDEM)
 
@@ -22,4 +20,4 @@ Illmatic (1994) by Nas
 
 <img src="https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e0271d840defb002ed3b180f7cd" />
 
-Last updated: 2026-11-08
+Last updated: 2026-11-21
