@@ -4,6 +4,7 @@ title: '"I want a president"'
 date: 2026-11-01T19:10:48-04:00
 tags:
   - art
+  - travel
 draft: false
 ---
 "The century that trusted in the future" started to dissolve in 1977, says Franco "Bifo" Berardi.[^1] Since then society has fragmented to the point that it has become un-recomposable. Recomposition means people finding a common ground for understanding and acting together for a common goal. "Human beings perform productive actions, but they are not conscious actors of what they are doing, and seem unable to join their feelings and thought in a common space of consciousness."[^2] Since we are unable to act together, the future has become something that happens to us. A kind of unavoidable catastrophe that we cannot oppose in any way.
