@@ -89,6 +89,7 @@ export default (() => {
         <link rel="icon" href={iconPath} />
         <meta name="description" content={description} />
         <meta name="generator" content="Quartz" />
+        <meta name="neatstats_verification" content="NeatStats:d3142dfdcc3e5097" />
         <link href={fontStylePath} rel="stylesheet" type="text/css" spa-preserve />
         {css.map((resource) => CSSResourceToStyleElement(resource, true))}
         {js

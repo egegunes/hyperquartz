@@ -103,6 +103,7 @@ const config: QuartzConfig = {
       // Comment out CustomOgImages to speed up build time
       Plugin.CustomOgImages(),
       Plugin.AliasRedirects(),
+      Plugin.WellKnown({ files: { neatstats: "NeatStats:d3142dfdcc3e5097" } }),
     ],
   },
 }
