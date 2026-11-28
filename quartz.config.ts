@@ -13,8 +13,7 @@ const config: QuartzConfig = {
     enableSPA: true,
     enablePopovers: true,
     analytics: {
-      provider: "fathom",
-      siteId: "ZSADLGKN",
+      provider: "neatstats",
     },
     locale: "en-US",
     baseUrl: "hypersubject.net",

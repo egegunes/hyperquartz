@@ -44,6 +44,9 @@ export type Analytics =
       scriptSrc?: string
     }
   | {
+      provider: "neatstats"
+    }
+  | {
       provider: "clarity"
       projectId?: string
     }

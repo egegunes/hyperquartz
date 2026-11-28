@@ -200,6 +200,12 @@ function addGlobalPageResources(ctx: BuildCtx, componentResources: ComponentReso
       fathomScript.defer = true
       document.head.appendChild(fathomScript)
     `)
+  } else if (cfg.analytics?.provider === "neatstats") {
+    componentResources.afterDOMLoaded.push(`
+      const neatstatsScript = document.createElement("script")
+      neatstatsScript.src = "https://neatstats.net/view.js"
+      document.head.appendChild(neatstatsScript)
+    `)
   } else if (cfg.analytics?.provider === "clarity") {
     componentResources.afterDOMLoaded.push(`
       const clarityScript = document.createElement("script")
